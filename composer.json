@@ -1,0 +1,15 @@
+{
+    "name": "martijnvdb/php-static-site-generator",
+    "description": "Static site generator written in PHP",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Martijn van den Bosch",
+            "email": "martijn_van_den_bosch@hotmail.com"
+        }
+    ],
+    "require": {
+        "martijnvdb/php-cli": "^0.1.0",
+        "twig/twig": "^3.3"
+    }
+}
