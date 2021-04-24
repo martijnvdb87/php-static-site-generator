@@ -5,13 +5,16 @@ namespace Martijnvdb\StaticSiteGenerator;
 class Files {
     public static function getContent($path = null)
     {
-        $content_path = __DIR__ . '/../content/';
+        return self::getFilesFromPath(__DIR__ . '/../content/', false, true);
+    }
 
-        if(empty($path)) {
-            $path = $content_path;
+    private static function getFilesFromPath($path, $show_dirs = false, $hide_hidden = false, $orignal_path = null)
+    {
+        if(empty($orignal_path)) {
+            $orignal_path = $path;
         }
 
-        $content = [];
+        $files_list = [];
 
         $files = scandir($path);
         
@@ -21,18 +24,27 @@ class Files {
             }
 
             if(is_dir("{$path}{$file}")) {
-                if(in_array(substr($file, 0, 1), ['_', '.', '@'])) {
+                if($hide_hidden && substr($file, 0, 1) === '_') {
                     continue;
                 }
 
-                $content = array_merge($content, self::getContent("{$path}{$file}/"));
+                $files_list = array_merge($files_list, self::getFilesFromPath("{$path}{$file}/", $show_dirs, $hide_hidden, $orignal_path));
+
+                if($show_dirs) {
+                    $files_list[] = substr("{$path}{$file}", strlen($orignal_path));
+                }
                 
             } else {
-                $content[] = substr("{$path}{$file}", strlen($content_path));
+                $files_list[] = substr("{$path}{$file}", strlen($orignal_path));
             }
 
         }
 
-        return $content;
+        return $files_list;
+    }
+
+    public static function deleteContent()
+    {
+
     }
 }
