@@ -43,8 +43,23 @@ class Files {
         return $files_list;
     }
 
-    public static function deleteContent()
+    public static function resetPublicDir()
     {
+        $public_path = __DIR__ . '/../public/';
 
+        if(!file_exists($public_path)) {
+            mkdir($public_path);
+        }
+
+        $files = self::getFilesFromPath($public_path, true);
+
+        foreach($files as $file) {
+            if(is_dir("{$public_path}{$file}")) {
+                rmdir("{$public_path}{$file}");
+
+            } else {
+                unlink("{$public_path}{$file}");
+            }
+        }
     }
 }

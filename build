@@ -10,6 +10,7 @@ $cli = (new Cli('Static site generator', '0.1.0'))
     ->add(function ($input, $output) {
         $public_path = __DIR__ . '/public/';
 
+        $files = Files::resetPublicDir();
         $files = Files::getContent();
 
         $loader = new FilesystemLoader(__DIR__ . '/content/_layouts');
@@ -31,12 +32,17 @@ $cli = (new Cli('Static site generator', '0.1.0'))
 
                 $dir_path = implode('/', $file_path);
 
-                if(!file_exists($dir_path)) {
+                if(sizeof($folders) > 1 && !file_exists($dir_path)) {
                     mkdir($dir_path);
                 }
             }
 
-            $file_path[] = 'index.html';
+            if(sizeof($file_path) === 2) {
+                $file_path[1] = "{$file_path[1]}.html";
+
+            } else {
+                $file_path[] = 'index.html';
+            }
 
             file_put_contents(implode('/', $file_path), $content);
         }
