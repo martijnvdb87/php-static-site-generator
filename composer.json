@@ -1,6 +1,12 @@
 {
     "name": "martijnvdb/php-static-site-generator",
     "description": "Static site generator written in PHP",
+    "version": "0.1.0",
+    "type": "project",
+    "keywords": [
+        "static site generator"
+    ],
+    "homepage": "https://github.com/martijnvdb87/php-static-site-generator",
     "license": "MIT",
     "authors": [
         {
@@ -11,5 +17,10 @@
     "require": {
         "martijnvdb/php-cli": "^0.1.0",
         "twig/twig": "^3.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Martijnvdb\\StaticSiteGenerator\\": "src/"
+        }
     }
 }

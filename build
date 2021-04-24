@@ -1,0 +1,11 @@
+<?php
+require __DIR__ . '/vendor/autoload.php';
+
+use Martijnvdb\StaticSiteGenerator\Files;
+use Martijnvdb\PhpCli\Cli;
+
+$cli = (new Cli('Static site generator', '0.1.0'))
+    ->add(function ($input, $output) {
+        print_r(Files::getContent());
+    })
+    ->run();
