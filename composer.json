@@ -16,7 +16,8 @@
     ],
     "require": {
         "martijnvdb/php-cli": "^0.1.0",
-        "twig/twig": "^3.3"
+        "twig/twig": "^3.3",
+        "mnapoli/front-yaml": "^1.8"
     },
     "autoload": {
         "psr-4": {

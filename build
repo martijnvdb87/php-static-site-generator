@@ -1,50 +1,23 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
 
-use Martijnvdb\StaticSiteGenerator\Files;
+use Martijnvdb\StaticSiteGenerator\File;
+use Martijnvdb\StaticSiteGenerator\Page;
 use Martijnvdb\PhpCli\Cli;
-use Twig\Loader\FilesystemLoader;
-use Twig\Environment;
 
 $cli = (new Cli('Static site generator', '0.1.0'))
     ->add(function ($input, $output) {
-        $public_path = __DIR__ . '/public/';
+        $files = File::resetPublicDir();
+        $files = File::getContent();
+        
+        $pages = [];
+        
+        foreach ($files as $file) {
+            $page = Page::create($file)->build();
 
-        $files = Files::resetPublicDir();
-        $files = Files::getContent();
-
-        $loader = new FilesystemLoader(__DIR__ . '/content/_layouts');
-        $twig = new Environment($loader);
-
-        foreach($files as $file) {
-            $parts = explode('.', $file);
-            $extension = array_pop($parts);
-            $parts = implode('.', $parts);
-            $folders = explode('/', $parts);
-
-            $template = $twig->load('index.html');
-            $content = $template->render(['the' => 'variables', 'go' => 'here']);
-
-            $file_path = [$public_path];
-
-            foreach($folders as $folder) {
-                $file_path[] = $folder;
-
-                $dir_path = implode('/', $file_path);
-
-                if(sizeof($folders) > 1 && !file_exists($dir_path)) {
-                    mkdir($dir_path);
-                }
-            }
-
-            if(sizeof($file_path) === 2) {
-                $file_path[1] = "{$file_path[1]}.html";
-
-            } else {
-                $file_path[] = 'index.html';
-            }
-
-            file_put_contents(implode('/', $file_path), $content);
+            $pages[] = $page;
         }
+
+        //print_r($pages);
     })
     ->run();
