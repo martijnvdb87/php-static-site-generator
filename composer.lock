@@ -58,16 +58,16 @@
         },
         {
             "name": "martijnvdb/php-cli",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/martijnvdb87/php-cli.git",
-                "reference": "75867c702905398a33d6bc9fa74b32bd8f1c347b"
+                "reference": "dc44db511dc0dd55a66072a10a27cff23b0df640"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/martijnvdb87/php-cli/zipball/75867c702905398a33d6bc9fa74b32bd8f1c347b",
-                "reference": "75867c702905398a33d6bc9fa74b32bd8f1c347b",
+                "url": "https://api.github.com/repos/martijnvdb87/php-cli/zipball/dc44db511dc0dd55a66072a10a27cff23b0df640",
+                "reference": "dc44db511dc0dd55a66072a10a27cff23b0df640",
                 "shasum": ""
             },
             "type": "library",
@@ -95,9 +95,9 @@
             ],
             "support": {
                 "issues": "https://github.com/martijnvdb87/php-cli/issues",
-                "source": "https://github.com/martijnvdb87/php-cli/tree/0.1.0"
+                "source": "https://github.com/martijnvdb87/php-cli/tree/0.1.1"
             },
-            "time": "2021-04-13T19:01:13+00:00"
+            "time": "2021-04-27T10:32:49+00:00"
         },
         {
             "name": "mnapoli/front-yaml",
