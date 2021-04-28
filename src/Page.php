@@ -15,15 +15,26 @@ class Page {
     private $html;
     private $template;
 
+    private $path;
+
+    private $paginate = false;
+    private $paginate_type;
+    private $paginate_amount = 10;
+    private $paginate_skip = 0;
+    private $paginate_url = 'page';
+
     private $source_content;
     private $source_parsed;
     
     private $templates_path = __DIR__ . '/../templates';
     private $public_path = __DIR__ . '/../public';
 
+    private $template_loader;
+
     public function __construct(string $source_path_relative)
     {
         $this->setPath($source_path_relative);
+        $this->template_loader = new FilesystemLoader($this->templates_path);
     }
 
     public static function create(string $source_path_relative): Page
@@ -72,7 +83,18 @@ class Page {
         return $this->source_parsed;
     }
 
-    private function getUrl(): string
+    public function getSkip(): int
+    {
+        return $this->paginate_skip;
+    }
+
+    public function setSkip(int $skip): int
+    {
+        $this->paginate_skip = $skip;
+        return $this->paginate_skip;
+    }
+
+    public function getUrl(): string
     {
         if(isset($this->url)) {
             return $this->url;
@@ -87,19 +109,19 @@ class Page {
 
         $variables = $this->getVariables();
 
-        if(isset($variables->url)) {
-            if(substr($variables->url, 0, 1) === '/') {
-                $parts = [substr($variables->url, 1)];
+        if(isset($variables['url'])) {
+            if(substr($variables['url'], 0, 1) === '/') {
+                $parts = [substr($variables['url'], 1)];
 
             } else {
                 array_pop($parts);
-                $parts[] = $variables->url;
+                $parts[] = $variables['url'];
             }
 
             $this->url = implode('/', $parts);
 
         } else {
-            if($parts[sizeof($parts) - 1] === 'index') {
+            if(sizeof($parts) === 1 && $parts[0] === 'index') {
                 array_pop($parts);
             }
 
@@ -107,6 +129,15 @@ class Page {
         }
 
         return $this->url;
+    }
+
+    public function getPath(): array
+    {
+        if(!isset($this->path)) {
+            $this->path = explode('/', $this->getUrl());
+        }
+
+        return $this->path;
     }
 
     private function getTemplate(): string
@@ -117,11 +148,11 @@ class Page {
         
         $variables = $this->getVariables();
 
-        if(isset($variables->template)) {
-            if(substr($variables->template, -5) === '.html') {
-                $this->template = $variables->template;
+        if(isset($variables['template'])) {
+            if(substr($variables['template'], -5) === '.html') {
+                $this->template = $variables['template'];
             } else {
-                $this->template = $variables->template . '.html';
+                $this->template = $variables['template'] . '.html';
             }
         }
 
@@ -141,13 +172,55 @@ class Page {
         return $this->template;
     }
 
-    private function getVariables(): object
+    public function setLoop(array $items): Page
+    {
+        foreach($items as $item) {
+            $this->variables['loop'][] = $item->getTemplateVariables();
+        }
+        
+        return $this;
+    }
+
+    public function getVariables(): array
     {
         if(!isset($this->variables)) {
-            $this->variables = (object) $this->getSourceParsed()->getYAML();
+            $this->variables = (array) $this->getSourceParsed()->getYAML();
         }
 
         return $this->variables;
+    }
+
+    public function getPaginate(): array
+    {
+        $variable = $this->getVariables();
+
+        if(isset($variable['paginate'])) {
+            $this->paginate = true;
+        }
+
+        if(isset($variable['paginate']['type'])) {
+            $this->paginate_type = $variable['paginate']['type'];
+        }
+
+        if(isset($variable['paginate']['amount'])) {
+            $this->paginate_amount = (int) $variable['paginate']['amount'];
+        }
+
+        if(isset($variable['paginate']['skip'])) {
+            $this->paginate_skip = (int) $variable['paginate']['skip'];
+        }
+
+        if(isset($variable['paginate']['url'])) {
+            $this->paginate_url = $variable['paginate']['url'];
+        }
+
+        return [
+            'paginate' => $this->paginate,
+            'type' => $this->paginate_type,
+            'amount' => $this->paginate_amount,
+            'skip' => $this->paginate_skip,
+            'url' => $this->paginate_url
+        ];
     }
 
     private function getHtml(): string
@@ -159,14 +232,23 @@ class Page {
         return $this->html;
     }
 
-    public function build(): void
+    public function getTemplateVariables(): array
     {
-        $loader = new FilesystemLoader($this->templates_path);
-        $twig = new Environment($loader);
-        $template = $twig->load($this->getTemplate());
-        $content = $template->render(['the' => 'variables', 'go' => 'here']);
+        return array_merge(
+            $this->getVariables(),
+            ['content' => $this->getHtml()]
+        );
+    }
 
-        $dirs = explode('/', $this->getUrl());
+    public function build(?string $custom_url = null): void
+    {
+        $twig = new Environment($this->template_loader);
+        $template = $twig->load($this->getTemplate());
+        $content = $template->render($this->getTemplateVariables());
+
+        $url = isset($custom_url) ? $custom_url : $this->getUrl();
+
+        $dirs = explode('/', $url);
 
         $file_path = [$this->public_path];
 

@@ -1,1 +1,7 @@
-INDEX TEMPLATE
+{% apply spaceless %}
+{{ include('_page-header.html') }}
+{{ include('_header.html') }}
+{{ content|raw }}
+{{ include('_footer.html') }}
+{{ include('_page-footer.html') }}
+{% endapply %}
