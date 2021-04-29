@@ -185,6 +185,21 @@ class Page {
     {
         if(!isset($this->variables)) {
             $this->variables = (array) $this->getSourceParsed()->getYAML();
+
+            if(!isset($this->variables['title'])) {
+                $parts = explode('/', $this->getUrl());
+                $title = array_pop($parts);
+
+                $title = ucwords($title);
+                $title = str_replace('-', ' ', $title);
+
+                $this->variables['title'] = $title;
+            }
+
+            if(!isset($this->variables['date'])) {
+                $date = filemtime($this->getSourcePathAbsolute());
+                $this->variables['date'] = $date;
+            }
         }
 
         return $this->variables;
