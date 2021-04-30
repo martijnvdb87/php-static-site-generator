@@ -1,3 +1,12 @@
-BLOG TEMPLATE
+{% apply spaceless %}
+{{ include('_page-header.html') }}
+{{ include('_header.html') }}
 
-{{ title }}
+<h1>{{ title }}</h1>
+<h6>{{ date }}</h6>
+
+<div>{{ content|raw }}</div>
+
+{{ include('_footer.html') }}
+{{ include('_page-footer.html') }}
+{% endapply %}

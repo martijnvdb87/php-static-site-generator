@@ -1,4 +1,21 @@
-{% for item in loop %}
-    <h2>{{ item.title }}</h2>
+{% apply spaceless %}
+{{ include('_page-header.html') }}
+{{ include('_header.html') }}
+
+{% for item in paginate.loop %}
+    <h2><a href="{{ item.url }}">{{ item.title }}</a></h2>
+    <h6>{{ item.date }}</h6>
     <div>{{ item.content|raw }}</div>
 {% endfor %}
+
+{% if paginate.previous.url %}
+<div><a href="{{ paginate.previous.url }}">Previous</a></div>
+{% endif %}
+
+{% if paginate.next.url %}
+<div><a href="{{ paginate.next.url }}">Next</a></div>
+{% endif %}
+
+{{ include('_footer.html') }}
+{{ include('_page-footer.html') }}
+{% endapply %}

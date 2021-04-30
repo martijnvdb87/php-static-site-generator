@@ -7,60 +7,10 @@ use Martijnvdb\PhpCli\Cli;
 
 $cli = (new Cli('Static site generator', '0.1.0'))
     ->add(function ($input, $output) {
-        $files = File::resetPublicDir();
-        $files = File::getContent();
+        File::resetPublicDir();
         
-        $pages = [];
-        
-        foreach ($files as $file) {
-            $page = Page::create($file); //->build();
-            $pages[] = $page;
-        }
-
-        foreach($pages as $page) {
-            $paginate = $page->getPaginate();
-
-            if($paginate['paginate']) {
-                $children = [];
-
-                foreach($pages as $child) {
-                    if($page === $child) {
-                        continue;
-                    }
-
-                    $path = $child->getPath();
-                    array_pop($path);
-        
-                    if(implode('/', $path) === $paginate['type']) {
-                        $children[] = $child;
-                    }
-                }
-
-                $amount_pages = ceil(sizeof($children) / $paginate['amount']);
-                $amount_pages = max($amount_pages, 1);
-                
-                $page_url = $page->getUrl();
-
-                for($page_num = 1; $page_num <= $amount_pages; $page_num++) {
-
-                    $loop = array_slice($children, 0, $paginate['amount']);
-
-                    if($page_num === 1) {
-                        $page->setLoop($loop)->build();
-                    }
-                    
-                    if($amount_pages > 1) {
-                        $page->setLoop($loop)->build("{$page_url}/{$paginate['url']}/{$page_num}");
-                    }
-                    
-                    $skip = $page->getSkip();
-                    $page->setSkip($skip + $paginate['amount']);
-                }
-
-            } else {
-                $page->build();
-            }
-
+        foreach (File::getContent() as $file) {
+            $page = Page::create($file)->build();
         }
     })
     ->run();
