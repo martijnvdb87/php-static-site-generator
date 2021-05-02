@@ -12,5 +12,68 @@ $cli = (new Cli('Static site generator', '0.1.0'))
         foreach (File::getContent() as $file) {
             $page = Page::create($file)->build();
         }
+        
+        $api_endpoints = [];
+
+        foreach (File::getContent() as $file) {
+            $page_variables = Page::create($file)->getTemplateVariables();
+
+            $url = $page_variables['url'];
+            $path = explode('/', $url);
+            $file = array_pop($path);
+
+
+            if(!isset($api_endpoints[$url])) {
+                $api_endpoints[$url] = [];
+            }
+
+            $item_data = [];
+
+            foreach(['title', 'url', 'date', 'content'] as $property) {
+                $api_endpoints[$url][$property] = $page_variables[$property];
+
+                $item_data[$property] = $page_variables[$property];
+            }
+
+            $parent_url = implode('/', $path);
+
+            if(!empty($url)) {
+                if(!isset($api_endpoints[$parent_url])) {
+                    $api_endpoints[$parent_url] = [];
+                }
+
+                if(!isset($api_endpoints[$parent_url]['items'])) {
+                    $api_endpoints[$parent_url]['items'] = [];
+                }
+
+                $api_endpoints[$parent_url]['items'][] = $item_data;
+            }
+
+        }
+
+        $api_dir = __DIR__ . '/public/api/';
+        mkdir($api_dir);
+
+        foreach($api_endpoints as $url => $data) {
+            $path = explode('/', $url);
+            array_pop($path);
+
+            $dir = [];
+            foreach($path as $part) {
+                $dir = implode('/', array_merge($dir, [$part]));
+
+                if(!file_exists($api_dir . $dir)) {
+                    mkdir($api_dir . $dir);
+                }
+            }
+
+            if(empty($url)) {
+                $url = 'index';
+            }
+
+            file_put_contents($api_dir . $url . '.json', json_encode($data));
+        }
+
+        print_r($api_endpoints);
     })
     ->run();

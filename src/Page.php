@@ -248,7 +248,10 @@ class Page {
                 $date = filemtime($this->getSourcePathAbsolute());
                 $this->variables['date'] = $date;
             }
+
+            $this->variables['url'] = $this->getUrl();
         }
+
             
         return $this->variables;
     }
@@ -315,7 +318,7 @@ class Page {
         );
     }
 
-    public function paginatedBuild(): void
+    public function paginatedBuild(): Page
     {
         $files = File::getContent();
         
@@ -380,9 +383,11 @@ class Page {
                 $this->setPaginateLoop($paginate_loop)->singleBuild("{$page_url}/{$paginate['url']}/{$page_num}");
             }
         }
+
+        return $this;
     }
     
-    public function singleBuild(?string $custom_url = null): void
+    public function singleBuild(?string $custom_url = null): Page
     {
         $twig = new Environment($this->template_loader);
         $template = $twig->load($this->getTemplate());
@@ -413,18 +418,18 @@ class Page {
         $build_url = implode('/', $file_path);
 
         file_put_contents($build_url, $content);
+        
+        return $this;
     }
 
-    public function build(): void
+    public function build(): Page
     {
         $paginate = $this->getPaginate();
 
         if($paginate['paginate']) {
-            $this->paginatedBuild();
-            return;
+            return $this->paginatedBuild();
         }
            
-        $this->singleBuild();
-        return;
+        return $this->singleBuild();
     }
 }
