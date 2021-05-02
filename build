@@ -68,10 +68,12 @@ $cli = (new Cli('Static site generator', '0.1.0'))
             }
 
             if(empty($url)) {
-                $url = 'index';
+                file_put_contents($api_dir . '/../api.json', json_encode($data));
+
+            } else {
+                file_put_contents($api_dir . $url . '.json', json_encode($data));
             }
 
-            file_put_contents($api_dir . $url . '.json', json_encode($data));
         }
 
         print_r($api_endpoints);
