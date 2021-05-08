@@ -7,7 +7,8 @@ use Twig\Environment;
 use Mni\FrontYAML\Parser;
 use Mni\FrontYAML\Document;
 
-class Page {
+class Page
+{
     private $source_path_relative;
     private $source_path_absolute;
     private $url;
@@ -28,7 +29,7 @@ class Page {
 
     private $source_content;
     private $source_parsed;
-    
+
     private $templates_path = __DIR__ . '/../templates';
     private $public_path = __DIR__ . '/../public';
 
@@ -60,7 +61,7 @@ class Page {
 
     private function getSourcePathAbsolute()
     {
-        if(!isset($this->source_path_absolute)) {
+        if (!isset($this->source_path_absolute)) {
             $this->source_path_absolute = __DIR__ . "/../content/{$this->getSourcePathRelative()}";
         }
 
@@ -69,7 +70,7 @@ class Page {
 
     private function getSourceContent(): string
     {
-        if(!isset($this->source_content)) {
+        if (!isset($this->source_content)) {
             $this->source_content = file_get_contents($this->getSourcePathAbsolute());
         }
 
@@ -78,11 +79,11 @@ class Page {
 
     private function getSourceParsed(): Document
     {
-        if(!isset($this->source_parsed)) {
+        if (!isset($this->source_parsed)) {
             $parser = new Parser();
             $this->source_parsed = $parser->parse($this->getSourceContent());
         }
-        
+
         return $this->source_parsed;
     }
 
@@ -99,7 +100,7 @@ class Page {
 
     public function getUrl(): string
     {
-        if(isset($this->url)) {
+        if (isset($this->url)) {
             return $this->url;
         }
 
@@ -112,19 +113,17 @@ class Page {
 
         $variables = $this->getVariables();
 
-        if(isset($variables['url'])) {
-            if(substr($variables['url'], 0, 1) === '/') {
+        if (isset($variables['url'])) {
+            if (substr($variables['url'], 0, 1) === '/') {
                 $parts = [substr($variables['url'], 1)];
-
             } else {
                 array_pop($parts);
                 $parts[] = $variables['url'];
             }
 
             $this->url = implode('/', $parts);
-
         } else {
-            if(sizeof($parts) === 1 && $parts[0] === 'index') {
+            if (sizeof($parts) === 1 && $parts[0] === 'index') {
                 array_pop($parts);
             }
 
@@ -138,7 +137,7 @@ class Page {
 
     public function getPath(): array
     {
-        if(!isset($this->path)) {
+        if (!isset($this->path)) {
             $this->path = explode('/', $this->getUrl());
         }
 
@@ -147,33 +146,33 @@ class Page {
 
     private function getTemplate(): string
     {
-        if(isset($this->template)) {
+        if (isset($this->template)) {
             return $this->template;
         }
-        
+
         $variables = $this->getVariables();
 
-        if(isset($variables['template'])) {
-            if(substr($variables['template'], -5) === '.html') {
+        if (isset($variables['template'])) {
+            if (substr($variables['template'], -5) === '.html') {
                 $this->template = $variables['template'];
             } else {
                 $this->template = $variables['template'] . '.html';
             }
         }
 
-        if(!isset($this->template)) {
+        if (!isset($this->template)) {
             $parts = explode('/', $this->getSourcePathRelative());
             array_pop($parts);
-            
-            if(sizeof($parts) > 0) {
-                $this->template = implode('.', $parts) . '.html';   
+
+            if (sizeof($parts) > 0) {
+                $this->template = implode('.', $parts) . '.html';
             }
         }
 
-        if(!isset($this->template) || !file_exists("{$this->templates_path}/{$this->template}")) {
+        if (!isset($this->template) || !file_exists("{$this->templates_path}/{$this->template}")) {
             $this->template = 'index.html';
         }
-        
+
         return $this->template;
     }
 
@@ -183,7 +182,7 @@ class Page {
 
         $base = "{$this->getUrl()}/{$this->paginate_url}/";
 
-        if($last_page > 1) {
+        if ($last_page > 1) {
             $this->variables['paginate'] = [
                 'first' => [
                     'number' => 1,
@@ -207,7 +206,7 @@ class Page {
                 ]
             ];
         }
-        
+
         return $this;
     }
 
@@ -216,10 +215,10 @@ class Page {
         $this->getVariables();
         $this->variables['paginate']['loop'] = [];
 
-        foreach($items as $item) {
+        foreach ($items as $item) {
             $this->variables['paginate']['loop'][] = $item->getTemplateVariables();
         }
-        
+
         return $this;
     }
 
@@ -231,10 +230,10 @@ class Page {
 
     public function getVariables(): array
     {
-        if(!isset($this->variables)) {
+        if (!isset($this->variables)) {
             $this->variables = (array) $this->getSourceParsed()->getYAML();
 
-            if(!isset($this->variables['title'])) {
+            if (!isset($this->variables['title'])) {
                 $parts = explode('/', $this->getUrl());
                 $title = array_pop($parts);
 
@@ -244,7 +243,7 @@ class Page {
                 $this->variables['title'] = $title;
             }
 
-            if(!isset($this->variables['date'])) {
+            if (!isset($this->variables['date'])) {
                 $date = filemtime($this->getSourcePathAbsolute());
                 $this->variables['date'] = $date;
             }
@@ -252,7 +251,7 @@ class Page {
             $this->variables['url'] = $this->getUrl();
         }
 
-            
+
         return $this->variables;
     }
 
@@ -260,31 +259,31 @@ class Page {
     {
         $variable = $this->getVariables();
 
-        if(isset($variable['paginate'])) {
+        if (isset($variable['paginate'])) {
             $this->paginate = true;
         }
 
-        if(isset($variable['paginate']['type'])) {
+        if (isset($variable['paginate']['type'])) {
             $this->paginate_type = $variable['paginate']['type'];
         }
 
-        if(isset($variable['paginate']['amount'])) {
+        if (isset($variable['paginate']['amount'])) {
             $this->paginate_amount = (int) $variable['paginate']['amount'];
         }
 
-        if(isset($variable['paginate']['skip'])) {
+        if (isset($variable['paginate']['skip'])) {
             $this->paginate_skip = (int) $variable['paginate']['skip'];
         }
 
-        if(isset($variable['paginate']['url'])) {
+        if (isset($variable['paginate']['url'])) {
             $this->paginate_url = $variable['paginate']['url'];
         }
 
-        if(isset($variable['paginate']['sort']) && isset($variable['paginate']['sort']['type'])) {
+        if (isset($variable['paginate']['sort']) && isset($variable['paginate']['sort']['type'])) {
             $this->paginate_sort_type = $variable['paginate']['sort']['type'];
         }
 
-        if(isset($variable['paginate']['sort']) && isset($variable['paginate']['sort']['asc'])) {
+        if (isset($variable['paginate']['sort']) && isset($variable['paginate']['sort']['asc'])) {
             $this->paginate_sort_asc = $variable['paginate']['sort']['asc'];
         }
 
@@ -303,7 +302,7 @@ class Page {
 
     private function getHtml(): string
     {
-        if(!isset($this->html)) {
+        if (!isset($this->html)) {
             $this->html = $this->getSourceParsed()->getContent();
         }
 
@@ -321,9 +320,9 @@ class Page {
     public function paginatedBuild(): Page
     {
         $files = File::getContent();
-        
+
         $pages = [];
-        
+
         foreach ($files as $file) {
             $page = Page::create($file);
             $pages[] = $page;
@@ -333,30 +332,30 @@ class Page {
 
         $children = [];
 
-        foreach($pages as $child) {
-            if($this === $child) {
+        foreach ($pages as $child) {
+            if ($this === $child) {
                 continue;
             }
 
             $path = $child->getPath();
             array_pop($path);
 
-            if(implode('/', $path) === $paginate['type']) {
+            if (implode('/', $path) === $paginate['type']) {
                 $children[] = $child;
             }
         }
 
-        usort($children, function(Page $a, Page $b) use ($paginate) {
+        usort($children, function (Page $a, Page $b) use ($paginate) {
             $paginate_type = $paginate['sort']['type'];
             $paginate_asc = $paginate['sort']['asc'];
 
             $a_vars = $a->getVariables();
             $b_vars = $b->getVariables();
 
-            if($paginate_asc) {
+            if ($paginate_asc) {
                 return $a_vars[$paginate_type] > $b_vars[$paginate_type];
             }
-            
+
             return $a_vars[$paginate_type] < $b_vars[$paginate_type];
         });
 
@@ -364,10 +363,10 @@ class Page {
 
         $amount_pages = ceil((sizeof($children) - $skip) / $paginate['amount']);
         $amount_pages = max($amount_pages, 1);
-        
+
         $page_url = $this->getUrl();
 
-        for($page_num = 1; $page_num <= $amount_pages; $page_num++) {
+        for ($page_num = 1; $page_num <= $amount_pages; $page_num++) {
             $start = ($page_num - 1) * $paginate['amount'] + $skip;
             $end = $page_num * $paginate['amount'] + $skip;
 
@@ -375,18 +374,18 @@ class Page {
 
             $this->setPaginatePages($page_num, $amount_pages);
 
-            if($page_num === 1) {
+            if ($page_num === 1) {
                 $this->setPaginateLoop($paginate_loop)->singleBuild();
             }
-            
-            if($amount_pages > 1) {
+
+            if ($amount_pages > 1) {
                 $this->setPaginateLoop($paginate_loop)->singleBuild("{$page_url}/{$paginate['url']}/{$page_num}");
             }
         }
 
         return $this;
     }
-    
+
     public function singleBuild(?string $custom_url = null): Page
     {
         $twig = new Environment($this->template_loader);
@@ -400,7 +399,7 @@ class Page {
         $file_path = [$this->public_path];
 
         foreach ($dirs as $dir) {
-            if(empty($dir)) {
+            if (empty($dir)) {
                 continue;
             }
 
@@ -418,7 +417,7 @@ class Page {
         $build_url = implode('/', $file_path);
 
         file_put_contents($build_url, $content);
-        
+
         return $this;
     }
 
@@ -426,10 +425,10 @@ class Page {
     {
         $paginate = $this->getPaginate();
 
-        if($paginate['paginate']) {
+        if ($paginate['paginate']) {
             return $this->paginatedBuild();
         }
-           
+
         return $this->singleBuild();
     }
 }
