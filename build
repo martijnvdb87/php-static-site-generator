@@ -4,13 +4,27 @@ require __DIR__ . '/vendor/autoload.php';
 use Martijnvdb\StaticSiteGenerator\File;
 use Martijnvdb\StaticSiteGenerator\Html;
 use Martijnvdb\StaticSiteGenerator\Api;
+use Martijnvdb\StaticSiteGenerator\Config;
 use Martijnvdb\PhpCli\Cli;
+use Martijnvdb\PhpCli\Input;
 
 $cli = (new Cli('Static site generator', '0.1.0'))
     ->add(function ($input, $output) {
+        $config = Config::create();
+
+        if(is_null($config->get('url'))) {
+            $url_value = Input::text('[yellow]Site url[/yellow]:')
+                ->required()
+                ->get();
+            
+            $config->set('url', $url_value);
+        }
+
+        $config->build();
+        
         File::resetPublicDir();
 
-        Html::build();
-        Api::build();
+        Html::create()->build();
+        Api::create()->build();
     })
     ->run();

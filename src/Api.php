@@ -2,11 +2,24 @@
 
 namespace Martijnvdb\StaticSiteGenerator;
 
+use Martijnvdb\StaticSiteGenerator\Config;
+
 class Api
 {
     private $api_dir = __DIR__ . '/../public/api/';
+    private $config = null;
 
     public function __construct()
+    {
+        $this->config = Config::create();
+    }
+
+    public static function create(): self
+    {
+        return new self;
+    }
+
+    public function build(): self
     {
         $api_endpoints = [];
 
@@ -30,15 +43,15 @@ class Api
             }
 
 
-            $api_endpoints[$url]['url'] = '/' . $page_variables['url'];
-            $item_data['url'] = '/' . $page_variables['url'];
+            $api_endpoints[$url]['url'] = $this->config->get('url') . '/' . $page_variables['url'];
+            $item_data['url'] = $this->config->get('url') . '/' . $page_variables['url'];
 
             if (empty($url)) {
-                $api_endpoints[$url]['resource'] = '/api.json';
-                $item_data['resource'] = '/api.json';
+                $api_endpoints[$url]['resource'] = $this->config->get('url') . '/api.json';
+                $item_data['resource'] = $this->config->get('url') . '/api.json';
             } else {
-                $api_endpoints[$url]['resource'] = '/api/' . $page_variables['url'] . '.json';
-                $item_data['resource'] = '/api/' . $page_variables['url'] . '.json';
+                $api_endpoints[$url]['resource'] = $this->config->get('url') . '/api/' . $page_variables['url'] . '.json';
+                $item_data['resource'] = $this->config->get('url') . '/api/' . $page_variables['url'] . '.json';
             }
 
             $parent_url = implode('/', $path);
@@ -83,11 +96,7 @@ class Api
                 file_put_contents($this->api_dir . $url . '.json', json_encode($data));
             }
         }
-    }
 
-    public static function build(): self
-    {
-        $api = new self;
-        return $api;
+        return $this;
     }
 }

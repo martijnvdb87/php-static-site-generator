@@ -8,14 +8,19 @@ class Html
 {
     public function __construct()
     {
+    }
+
+    public static function create(): self
+    {
+        return new self;
+    }
+
+    public function build(): self
+    {
         foreach (File::getContent() as $file) {
             Page::create($file)->build();
         }
-    }
 
-    public static function build(): self
-    {
-        $html = new self;
-        return $html;
+        return $this;
     }
 }
