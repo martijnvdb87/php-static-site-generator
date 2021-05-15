@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "77b5c39ac85cded45dfe91b25a9af8f6",
+    "content-hash": "6f0066a76c84538213ba3bf61a902951",
     "packages": [
         {
             "name": "erusev/parsedown",
@@ -58,16 +58,16 @@
         },
         {
             "name": "martijnvdb/php-cli",
-            "version": "0.1.1",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/martijnvdb87/php-cli.git",
-                "reference": "dc44db511dc0dd55a66072a10a27cff23b0df640"
+                "reference": "dacdf86b11c2ab7408ac69d2dd74eaf306a536b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/martijnvdb87/php-cli/zipball/dc44db511dc0dd55a66072a10a27cff23b0df640",
-                "reference": "dc44db511dc0dd55a66072a10a27cff23b0df640",
+                "url": "https://api.github.com/repos/martijnvdb87/php-cli/zipball/dacdf86b11c2ab7408ac69d2dd74eaf306a536b4",
+                "reference": "dacdf86b11c2ab7408ac69d2dd74eaf306a536b4",
                 "shasum": ""
             },
             "type": "library",
@@ -95,9 +95,9 @@
             ],
             "support": {
                 "issues": "https://github.com/martijnvdb87/php-cli/issues",
-                "source": "https://github.com/martijnvdb87/php-cli/tree/0.1.1"
+                "source": "https://github.com/martijnvdb87/php-cli/tree/0.2.0"
             },
-            "time": "2021-04-27T10:32:49+00:00"
+            "time": "2021-05-14T19:44:39+00:00"
         },
         {
             "name": "mnapoli/front-yaml",
@@ -441,16 +441,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v3.3.0",
+            "version": "v3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "1f3b7e2c06cc05d42936a8ad508ff1db7975cdc5"
+                "reference": "ac44433c49892bf28d47c852b19832f3823bd351"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/1f3b7e2c06cc05d42936a8ad508ff1db7975cdc5",
-                "reference": "1f3b7e2c06cc05d42936a8ad508ff1db7975cdc5",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/ac44433c49892bf28d47c852b19832f3823bd351",
+                "reference": "ac44433c49892bf28d47c852b19832f3823bd351",
                 "shasum": ""
             },
             "require": {
@@ -501,7 +501,7 @@
             ],
             "support": {
                 "issues": "https://github.com/twigphp/Twig/issues",
-                "source": "https://github.com/twigphp/Twig/tree/v3.3.0"
+                "source": "https://github.com/twigphp/Twig/tree/v3.3.1"
             },
             "funding": [
                 {
@@ -513,7 +513,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-08T09:54:36+00:00"
+            "time": "2021-05-12T08:05:35+00:00"
         }
     ],
     "packages-dev": [],
