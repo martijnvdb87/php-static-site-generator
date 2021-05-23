@@ -18,7 +18,8 @@
         "martijnvdb/php-cli": "^0.2.0",
         "twig/twig": "^3.3",
         "mnapoli/front-yaml": "^1.8",
-        "symfony/yaml": "^5.2"
+        "symfony/yaml": "^5.2",
+        "martijnvdb/php-image-resize": "^0.1.0"
     },
     "autoload": {
         "psr-4": {

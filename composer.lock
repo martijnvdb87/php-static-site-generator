@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6f0066a76c84538213ba3bf61a902951",
+    "content-hash": "06283fc9d49db8cfdcf5cdd500c2667d",
     "packages": [
         {
             "name": "erusev/parsedown",
@@ -98,6 +98,49 @@
                 "source": "https://github.com/martijnvdb87/php-cli/tree/0.2.0"
             },
             "time": "2021-05-14T19:44:39+00:00"
+        },
+        {
+            "name": "martijnvdb/php-image-resize",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/martijnvdb87/php-image-resize.git",
+                "reference": "200322475d0abfd59971db001b62e7b4452ec078"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/martijnvdb87/php-image-resize/zipball/200322475d0abfd59971db001b62e7b4452ec078",
+                "reference": "200322475d0abfd59971db001b62e7b4452ec078",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Martijnvdb\\ImageResize\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Martijn van den Bosch",
+                    "email": "martijn_van_den_bosch@hotmail.com",
+                    "homepage": "https://martijnvandenbosch.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Simple library for resizing and converting images to different filetypes",
+            "homepage": "https://github.com/martijnvdb87/php-image-resize",
+            "keywords": [
+                "image resize"
+            ],
+            "support": {
+                "issues": "https://github.com/martijnvdb87/php-image-resize/issues",
+                "source": "https://github.com/martijnvdb87/php-image-resize/tree/0.1.0"
+            },
+            "time": "2021-05-22T16:14:33+00:00"
         },
         {
             "name": "mnapoli/front-yaml",
