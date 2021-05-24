@@ -1,3 +1,4 @@
 /vendor/
+assets/*
 public/*
 config.yaml

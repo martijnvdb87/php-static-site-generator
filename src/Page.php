@@ -6,9 +6,12 @@ use Twig\Loader\FilesystemLoader;
 use Twig\Environment;
 use Mni\FrontYAML\Parser;
 use Mni\FrontYAML\Document;
+use Martijnvdb\ImageResize\ImageResize;
 
 class Page
 {
+    private $config = null;
+
     private $source_path_relative;
     private $source_path_absolute;
     private $url;
@@ -37,6 +40,7 @@ class Page
 
     public function __construct(string $source_path_relative)
     {
+        $this->config = Config::create();
         $this->setPath($source_path_relative);
         $this->template_loader = new FilesystemLoader($this->templates_path);
     }
@@ -81,7 +85,44 @@ class Page
     {
         if (!isset($this->source_parsed)) {
             $parser = new Parser();
-            $this->source_parsed = $parser->parse($this->getSourceContent());
+
+            $source_content = $this->getSourceContent();
+
+            $source_content = preg_replace_callback('/\!\[(.+?)\]\((.+?)\)/', function($matches) {
+                $alt = $matches[1];                
+                $pathinfo = pathinfo($matches[2]);
+                $id = md5($matches[2]);
+
+                $source_path = $matches[2];
+                $source_path = trim($source_path, '/');
+
+                $source_path = __DIR__ . '/../' . $source_path;
+                
+                $uri = $this->config->get('url') . '/assets/images/' . $id . '.' . $pathinfo['extension'];
+                
+                $output = '';
+                $output .= '<picture>';
+                
+                list($source_width) = getimagesize($source_path);
+
+                foreach([240, 480, 960, 1920] as $width) {
+                    if($source_width < $width) {
+                        break;
+                    }
+
+                    $export_path = "{$this->public_path}/assets/images/$id-{$width}w.{$pathinfo['extension']}";
+                    $uri = "{$this->config->get('url')}/assets/images/$id-{$width}w.{$pathinfo['extension']}";
+                    ImageResize::get($source_path)->setWidth($width)->export($export_path);
+                    $output .= "<source srcset='$uri' media='(max-width: {$width}px)'>";
+                }
+
+                $output .= '<img srcset="' . $uri . '" alt="' . $alt . '">';
+                $output .= '</picture>';
+
+                return $output;
+            }, $source_content);
+
+            $this->source_parsed = $parser->parse($source_content);
         }
 
         return $this->source_parsed;
