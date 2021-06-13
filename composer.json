@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "martijnvdb/php-cli": "^0.2.0",
+        "martijnvdb/php-cli": "^0.3.0",
         "twig/twig": "^3.3",
         "mnapoli/front-yaml": "^1.8",
         "symfony/yaml": "^5.2",
