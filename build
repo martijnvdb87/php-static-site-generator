@@ -7,6 +7,7 @@ use Martijnvdb\StaticSiteGenerator\Api;
 use Martijnvdb\StaticSiteGenerator\Config;
 use Martijnvdb\PhpCli\Cli;
 use Martijnvdb\PhpCli\Input;
+use Martijnvdb\PhpCli\Progress;
 
 $cli = (new Cli('Static site generator', '0.1.0'))
     ->add(function ($input, $output) {
@@ -21,10 +22,21 @@ $cli = (new Cli('Static site generator', '0.1.0'))
         }
 
         $config->build();
+
+        $GLOBALS['progress_current'] = 0;
+
+        $GLOBALS['progress'] = Progress::new();
+        $GLOBALS['progress']->start();
         
         File::resetPublicDir();
 
         Html::create()->build();
+
+        $GLOBALS['progress']->set(0.75);
+        
         Api::create()->build();
+        
+        $GLOBALS['progress']->set(1);
+        $GLOBALS['progress']->stop();
     })
     ->run();
