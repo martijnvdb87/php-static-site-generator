@@ -21,7 +21,7 @@ class Page
 
     private $path;
 
-    private $is_pagination = false;
+    private $generate_images = true;
 
     private $paginate = false;
     private $paginate_type;
@@ -115,7 +115,7 @@ class Page
                     $export_path = "{$this->public_path}/assets/images/$id-{$width}w.{$pathinfo['extension']}";
                     $uri = "{$this->config->get('url')}/assets/images/$id-{$width}w.{$pathinfo['extension']}";
                     
-                    if(!$this->is_pagination) {
+                    if($this->generate_images) {
                         ImageResize::get($source_path)->setWidth($width)->export($export_path);
                     }
                     
@@ -145,9 +145,9 @@ class Page
         return $this->paginate_skip;
     }
 
-    public function isPagination(bool $is_pagination = true): self
+    public function generateImages(bool $generate_images = true): self
     {
-        $this->is_pagination = $is_pagination;
+        $this->generate_images = $generate_images;
         return $this;
     }
 
@@ -378,7 +378,7 @@ class Page
 
         foreach ($files as $file) {
             $page = Page::create($file);
-            $page->isPagination();
+            $page->generateImages(false);
             $pages[] = $page;
         }
 

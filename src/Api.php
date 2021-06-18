@@ -24,7 +24,7 @@ class Api
         $api_endpoints = [];
 
         foreach (File::getContent() as $file) {
-            $page_variables = Page::create($file)->getTemplateVariables();
+            $page_variables = Page::create($file)->generateImages(false)->getTemplateVariables();
 
             $url = $page_variables['url'];
             $path = explode('/', $url);
