@@ -302,6 +302,7 @@ class Page
             }
 
             $this->variables['url'] = $this->getUrl();
+            $this->variables['source_path_relative'] = $this->getSourcePathRelative();
         }
 
 

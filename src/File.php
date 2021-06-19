@@ -2,6 +2,8 @@
 
 namespace Martijnvdb\StaticSiteGenerator;
 
+use Martijnvdb\StaticSiteGenerator\Page;
+
 class File
 {
     private static $content_path = __DIR__ . '/../content';
@@ -9,7 +11,21 @@ class File
 
     public static function getContent($path = null)
     {
-        return self::getFilesFromPath(self::$content_path, false, true);
+        $files = self::getFilesFromPath(self::$content_path, false, true);
+
+        $files_variables = [];
+
+        foreach($files as $file) {
+            $variables = Page::create($file)->getVariables();
+
+            $files_variables[] = $variables;
+        }
+
+        $dates = array_column($files_variables, 'date');
+
+        array_multisort($files_variables, SORT_DESC, $dates);
+
+        return array_column($files_variables, 'source_path_relative');
     }
 
     private static function getFilesFromPath($path, $show_dirs = false, $hide_hidden = false, $orignal_path = null)
