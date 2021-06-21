@@ -10,12 +10,20 @@ class Config
     private $exists = false;
     private $config = [];
 
+    private static $instance;
+
     public function __construct()
     {
+        if(isset(self::$instance)) {
+            return $this;
+        }
+
         if(!$this->exists && file_exists($this->path)) {
             $this->config = Yaml::parse(file_get_contents($this->path));
             $this->exists = true;
         }
+
+        self::$instance = $this;
     }
 
     public static function create(): self
