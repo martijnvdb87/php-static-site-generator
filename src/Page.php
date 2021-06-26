@@ -13,8 +13,6 @@ class Page
 {
     private static $cache = [];
 
-    private $config = null;
-
     private $source_path_relative;
     private $source_path_absolute;
     private $url;
@@ -47,7 +45,6 @@ class Page
 
     public function __construct(string $source_path_relative)
     {
-        $this->config = Config::create();
         $this->setPath($source_path_relative);
         $this->template_loader = new FilesystemLoader($this->templates_path);
     }

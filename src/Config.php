@@ -6,57 +6,38 @@ use Symfony\Component\Yaml\Yaml;
 
 class Config
 {
-    private $path = __DIR__ . '/../config.yaml';
-    private $exists = false;
-    private $config = [];
+    private static $path = __DIR__ . '/../config.yaml';
+    private static $config = [];
 
-    private static $instance;
-
-    public function __construct()
+    private static function load()
     {
-        if(isset(self::$instance)) {
-            return $this;
+        if(empty(self::$config)) {
+            if(file_exists(self::$path)) {
+                self::$config = Yaml::parse(file_get_contents(self::$path));
+            }
         }
-
-        if(!$this->exists && file_exists($this->path)) {
-            $this->config = Yaml::parse(file_get_contents($this->path));
-            $this->exists = true;
-        }
-
-        self::$instance = $this;
     }
 
-    public static function create(): self
+    public static function get(string $key): ?string
     {
-        $config = new self;
-        return $config;
-    }
+        self::load();
 
-    public function exists(): bool
-    {
-        return $this->exists;
-    }
-
-    public function get(string $key): ?string
-    {
-        if(isset($this->config[$key])) {
-            return $this->config[$key];
+        if(isset(self::$config[$key])) {
+            return self::$config[$key];
         }
 
         return null;
     }
 
-    public function set(string $key, string $value): self
+    public static function set(string $key, string $value): void
     {
-        $this->config[$key] = $value;
+        self::load();
 
-        return $this;
+        self::$config[$key] = $value;
     }
 
-    public function build(): self
+    public static function save(): void
     {
-        file_put_contents($this->path, Yaml::dump($this->config));
-
-        return $this;
+        file_put_contents(self::$path, Yaml::dump(self::$config));
     }
 }

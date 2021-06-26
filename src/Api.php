@@ -7,11 +7,9 @@ use Martijnvdb\StaticSiteGenerator\Config;
 class Api
 {
     private $api_dir = __DIR__ . '/../public/api/';
-    private $config = null;
 
     public function __construct()
     {
-        $this->config = Config::create();
     }
 
     public static function create(): self
@@ -43,15 +41,15 @@ class Api
             }
 
 
-            $api_endpoints[$url]['url'] = $this->config->get('url') . '/' . $page_variables['url'];
-            $item_data['url'] = $this->config->get('url') . '/' . $page_variables['url'];
+            $api_endpoints[$url]['url'] = Config::get('url') . '/' . $page_variables['url'];
+            $item_data['url'] = Config::get('url') . '/' . $page_variables['url'];
 
             if (empty($url)) {
-                $api_endpoints[$url]['resource'] = $this->config->get('url') . '/api.json';
-                $item_data['resource'] = $this->config->get('url') . '/api.json';
+                $api_endpoints[$url]['resource'] = Config::get('url') . '/api.json';
+                $item_data['resource'] = Config::get('url') . '/api.json';
             } else {
-                $api_endpoints[$url]['resource'] = $this->config->get('url') . '/api/' . $page_variables['url'] . '.json';
-                $item_data['resource'] = $this->config->get('url') . '/api/' . $page_variables['url'] . '.json';
+                $api_endpoints[$url]['resource'] = Config::get('url') . '/api/' . $page_variables['url'] . '.json';
+                $item_data['resource'] = Config::get('url') . '/api/' . $page_variables['url'] . '.json';
             }
 
             $parent_url = implode('/', $path);

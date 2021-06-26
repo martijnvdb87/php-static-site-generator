@@ -12,17 +12,15 @@ use Martijnvdb\PhpCli\Progress;
 
 $cli = (new Cli('Static site generator', '0.1.0'))
     ->add(function ($input, $output) {
-        $config = Config::create();
-
-        if(is_null($config->get('url'))) {
+        if(is_null(Config::get('url'))) {
             $url_value = Input::text('[yellow]Site url[/yellow]:')
                 ->required()
                 ->get();
             
-            $config->set('url', $url_value);
+            Config::set('url', $url_value);
         }
 
-        $config->build();
+        Config::save();
 
         $GLOBALS['progress'] = Progress::new();
         $GLOBALS['progress']->start();

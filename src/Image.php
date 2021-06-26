@@ -6,7 +6,6 @@ use Martijnvdb\ImageResize\ImageResize;
 
 class Image
 {
-    private $config = null;
     private static $images = [];
     private static $target_sizes = [240, 480, 960, 1920];
 
@@ -23,8 +22,6 @@ class Image
 
     public function __construct(string $source_path, ?string $alt = null)
     {
-        $this->config = Config::create();
-
         $this->source_path = __DIR__ . '/../' . $source_path;
 
         $this->id = md5($this->source_path);
@@ -63,7 +60,7 @@ class Image
                 break;
             }
 
-            $uri = "{$this->config->get('url')}/assets/images/{$this->id}-{$width}w.{$this->source_extension}";
+            $uri = Config::get('url') . "/assets/images/{$this->id}-{$width}w.{$this->source_extension}";
             $output .= "<source srcset='$uri' media='(max-width: {$width}px)'>";
         }
 
