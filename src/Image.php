@@ -47,15 +47,22 @@ class Image
 
     public static function getTargetSizes(): array
     {
-        return self::$target_sizes;
+        return Config::get('images.sizes') ?? [];
     }
 
     public function getHtml(): string
     {
         $output = '';
+
+        $sizes = Image::getTargetSizes();
+
+        if(empty($sizes)) {
+            return $output;
+        }
+        
         $output .= '<picture>';
         
-        foreach(Image::getTargetSizes() as $width) {
+        foreach($sizes as $width) {
             if($this->source_width < $width) {
                 break;
             }

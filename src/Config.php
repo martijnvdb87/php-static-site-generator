@@ -18,15 +18,24 @@ class Config
         }
     }
 
-    public static function get(string $key): ?string
+    public static function get(string $key)
     {
         self::load();
 
-        if(isset(self::$config[$key])) {
-            return self::$config[$key];
+        $parts = explode('.', $key);
+
+        $config = self::$config;
+        
+        while($part = array_shift($parts)) {
+            if(!isset($config[$part])) {
+                return null;
+            }
+
+            $config = $config[$part];
         }
 
-        return null;
+
+        return $config;
     }
 
     public static function set(string $key, string $value): void
