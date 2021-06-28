@@ -7,7 +7,6 @@ use Martijnvdb\ImageResize\ImageResize;
 class Image
 {
     private static $images = [];
-    private static $target_sizes = [240, 480, 960, 1920];
 
     private $source_path;
     private $source_width;

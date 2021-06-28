@@ -9,6 +9,7 @@ use Martijnvdb\StaticSiteGenerator\Config;
 use Martijnvdb\PhpCli\Cli;
 use Martijnvdb\PhpCli\Input;
 use Martijnvdb\PhpCli\Progress;
+use Martijnvdb\StaticSiteGenerator\Manifest;
 
 $cli = (new Cli('Static site generator', '0.1.0'))
     ->add(function ($input, $output) {
@@ -32,6 +33,9 @@ $cli = (new Cli('Static site generator', '0.1.0'))
         Html::create()->build();
 
         $GLOBALS['progress']->set(0.1);
+
+        // Build Manifest file
+        Manifest::create()->build();
         
         // Build API files
         Api::create()->build();

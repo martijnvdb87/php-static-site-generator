@@ -8,6 +8,9 @@ class Config
 {
     private static $path = __DIR__ . '/../config.yaml';
     private static $config = [];
+    
+    private static $content_path = __DIR__ . '/../content';
+    private static $public_path = __DIR__ . '/../public';
 
     private static function load()
     {
@@ -15,6 +18,11 @@ class Config
             if(file_exists(self::$path)) {
                 self::$config = Yaml::parse(file_get_contents(self::$path));
             }
+
+            self::$config['path'] = [
+                'content' => self::$content_path,
+                'public' => self::$public_path
+            ];
         }
     }
 
