@@ -44,11 +44,60 @@ class Manifest
         return $manifest;
     }
 
-    public function build(): self
+    private static function get(string $key)
     {
         $data = self::$defaults;
+        
+        $parts = explode('.', $key);
+        
+        while($part = array_shift($parts)) {
+            if(!isset($data[$part])) {
+                return null;
+            }
 
-        $data['name'] = Config::get('name') ?? $data['name'];
+            $data = $data[$part];
+        }
+
+        return $data;
+    }
+
+    private static function set(string $key, $value): void
+    {
+        $data = &self::$defaults;
+        
+        $parts = explode('.', $key);
+
+        foreach($parts as $part) {
+            if(!isset($data[$part])) {
+                $data = [
+                    $part => []
+                ];
+            }
+            
+            $data = &$data[$part];
+        }
+
+        $data = $value;
+    }
+
+    public function build(): self
+    {
+        $data = &self::$defaults;
+
+        $config_mapping = [
+            'name' => 'name',
+            'short_name' => 'short_name',
+            'start_url' => 'start_url',
+            'background_color' => 'background_color',
+            'display' => 'display',
+            'scope' => 'scope',
+            'theme_color' => 'theme_color',
+            'description' => 'description',
+        ];
+
+        foreach($config_mapping as $key => $config) {
+            self::set($key, Config::get($config) ?? self::get($key));
+        }
 
         $data = json_encode($data);
 
