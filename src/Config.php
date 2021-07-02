@@ -6,11 +6,12 @@ use Symfony\Component\Yaml\Yaml;
 
 class Config
 {
-    private static $path = __DIR__ . '/../config.yaml';
+    private static $path = 'config.yaml';
     private static $config = [];
     
-    private static $content_path = __DIR__ . '/../content';
-    private static $public_path = __DIR__ . '/../public';
+    private static $content_path = 'content';
+    private static $templates_path = 'templates';
+    private static $public_path = 'public';
 
     private static function load()
     {
@@ -19,10 +20,13 @@ class Config
                 self::$config = Yaml::parse(file_get_contents(self::$path));
             }
 
-            self::$config['path'] = [
-                'content' => self::$content_path,
-                'public' => self::$public_path
-            ];
+            foreach([
+                'path.content' => self::$content_path,
+                'path.templates' => self::$templates_path,
+                'path.public' => self::$public_path
+            ] as $key => $value) {
+                self::set($key, self::get($key) ?? $value);
+            }
         }
     }
 
@@ -50,7 +54,19 @@ class Config
     {
         self::load();
 
-        self::$config[$key] = $value;
+        $data = &self::$config;
+        
+        $parts = explode('.', $key);
+
+        foreach($parts as $part) {
+            if(!isset($data[$part])) {
+                $data[$part] = [];
+            }
+            
+            $data = &$data[$part];
+        }
+
+        $data = $value;
     }
 
     public static function save(): void

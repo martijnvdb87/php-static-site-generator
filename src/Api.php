@@ -67,7 +67,9 @@ class Api
             }
         }
 
-        mkdir($this->api_dir);
+        if(!is_dir($this->api_dir)) {
+            mkdir($this->api_dir);
+        }
 
         foreach ($api_endpoints as $url => $data) {
             $path = explode('/', $url);

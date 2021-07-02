@@ -7,6 +7,7 @@ use Twig\Environment;
 use Mni\FrontYAML\Parser;
 use Mni\FrontYAML\Document;
 
+use Martijnvdb\StaticSiteGenerator\Config;
 use Martijnvdb\StaticSiteGenerator\Image;
 
 class Page
@@ -38,15 +39,12 @@ class Page
     private $source_content;
     private $source_parsed;
 
-    private $templates_path = __DIR__ . '/../templates';
-    private $public_path = __DIR__ . '/../public';
-
     private $template_loader;
 
     public function __construct(string $source_path_relative)
     {
         $this->setPath($source_path_relative);
-        $this->template_loader = new FilesystemLoader($this->templates_path);
+        $this->template_loader = new FilesystemLoader(Config::get('path.templates'));
     }
 
     public static function create(string $source_path_relative): Page
@@ -196,7 +194,7 @@ class Page
             }
         }
 
-        if (!isset($this->template) || !file_exists("{$this->templates_path}/{$this->template}")) {
+        if (!isset($this->template) || !file_exists(Config::get('path.templates') . "/{$this->template}")) {
             $this->template = 'index.html';
         }
 
@@ -425,7 +423,7 @@ class Page
 
         $dirs = explode('/', $url);
 
-        $file_path = [$this->public_path];
+        $file_path = [Config::get('path.public')];
 
         foreach ($dirs as $dir) {
             if (empty($dir)) {

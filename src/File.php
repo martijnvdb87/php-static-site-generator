@@ -3,15 +3,13 @@
 namespace Martijnvdb\StaticSiteGenerator;
 
 use Martijnvdb\StaticSiteGenerator\Page;
+use Martijnvdb\StaticSiteGenerator\Config;
 
 class File
 {
-    private static $content_path = __DIR__ . '/../content';
-    private static $public_path = __DIR__ . '/../public';
-
     public static function getContent($path = null)
     {
-        $files = self::getFilesFromPath(self::$content_path, false, true);
+        $files = self::getFilesFromPath(Config::get('path.content'), false, true);
 
         $files_variables = [];
 
@@ -65,17 +63,17 @@ class File
 
     public static function resetPublicDir()
     {
-        if (!file_exists(self::$public_path)) {
-            mkdir(self::$public_path);
+        if (!file_exists(Config::get('path.public'))) {
+            mkdir(Config::get('path.public'));
         }
 
-        $files = self::getFilesFromPath(self::$public_path, true);
+        $files = self::getFilesFromPath(Config::get('path.public'), true);
 
         foreach ($files as $file) {
-            if (is_dir(self::$public_path . '/' . $file)) {
-                rmdir(self::$public_path . '/' . $file);
+            if (is_dir(Config::get('path.public') . '/' . $file)) {
+                rmdir(Config::get('path.public') . '/' . $file);
             } else {
-                unlink(self::$public_path . '/' . $file);
+                unlink(Config::get('path.public') . '/' . $file);
             }
         }
     }

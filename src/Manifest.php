@@ -69,9 +69,7 @@ class Manifest
 
         foreach($parts as $part) {
             if(!isset($data[$part])) {
-                $data = [
-                    $part => []
-                ];
+                $data[$part] = [];
             }
             
             $data = &$data[$part];
