@@ -7,7 +7,7 @@ use Martijnvdb\StaticSiteGenerator\Config;
 
 class File
 {
-    public static function getContent($path = null)
+    public static function getContent($path = null): array
     {
         $files = self::getFilesFromPath(Config::get('path.content'), false, true);
 
@@ -26,7 +26,7 @@ class File
         return array_column($files_variables, 'source_path_relative');
     }
 
-    private static function getFilesFromPath($path, $show_dirs = false, $hide_hidden = false, $orignal_path = null)
+    private static function getFilesFromPath($path, $show_dirs = false, $hide_hidden = false, $orignal_path = null): array
     {
         $path = substr($path, -1) === '/' ? $path : $path . '/';
 
@@ -61,7 +61,7 @@ class File
         return $files_list;
     }
 
-    public static function resetPublicDir()
+    public static function resetPublicDir(): void
     {
         if (!file_exists(Config::get('path.public'))) {
             mkdir(Config::get('path.public'));

@@ -13,7 +13,7 @@ class Config
     private static $templates_path = 'templates';
     private static $public_path = 'public';
 
-    private static function load()
+    private static function load(): void
     {
         if(empty(self::$config)) {
             if(file_exists(self::$path)) {

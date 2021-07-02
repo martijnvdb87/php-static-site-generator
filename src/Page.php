@@ -66,12 +66,12 @@ class Page
         return $this;
     }
 
-    private function getSourcePathRelative()
+    private function getSourcePathRelative(): string
     {
         return $this->source_path_relative;
     }
 
-    private function getSourcePathAbsolute()
+    private function getSourcePathAbsolute(): string
     {
         if (!isset($this->source_path_absolute)) {
             $this->source_path_absolute = __DIR__ . "/../content/{$this->getSourcePathRelative()}";
@@ -448,12 +448,12 @@ class Page
         return $this;
     }
 
-    public function getIsBuilt()
+    public function getIsBuilt(): bool
     {
         return $this->is_built;
     }
 
-    public function setIsBuilt(bool $is_built)
+    public function setIsBuilt(bool $is_built): self
     {
         $this->is_built = $is_built;
         return $this;
