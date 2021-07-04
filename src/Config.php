@@ -7,7 +7,7 @@ use Symfony\Component\Yaml\Yaml;
 class Config
 {
     private static $path = 'config.yaml';
-    private static $config = [];
+    private static $config = null;
     
     private static $content_path = 'content';
     private static $templates_path = 'templates';
@@ -15,9 +15,9 @@ class Config
 
     private static function load(): void
     {
-        if(empty(self::$config)) {
+        if(!isset(self::$config)) {
             if(file_exists(self::$path)) {
-                self::$config = Yaml::parse(file_get_contents(self::$path));
+                self::$config = Yaml::parse(file_get_contents(self::$path)) ?? [];
             }
 
             foreach([

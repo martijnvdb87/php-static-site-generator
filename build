@@ -13,16 +13,6 @@ use Martijnvdb\StaticSiteGenerator\Manifest;
 
 $cli = (new Cli('Static site generator', '0.1.0'))
     ->add(function ($input, $output) {
-        if(is_null(Config::get('url'))) {
-            $url_value = Input::text('[yellow]Site url[/yellow]:')
-                ->required()
-                ->get();
-            
-            Config::set('url', $url_value);
-        }
-
-        Config::save();
-
         $GLOBALS['progress'] = Progress::new();
         $GLOBALS['progress']->start();
         
@@ -32,7 +22,7 @@ $cli = (new Cli('Static site generator', '0.1.0'))
         // Build HTML files
         Html::create()->build();
 
-        $GLOBALS['progress']->set(0.1);
+        $GLOBALS['progress']->set(0.2);
 
         // Build Manifest file
         Manifest::create()->build();
@@ -40,14 +30,14 @@ $cli = (new Cli('Static site generator', '0.1.0'))
         // Build API files
         Api::create()->build();
         
-        $GLOBALS['progress']->set(0.2);
+        $GLOBALS['progress']->set(0.4);
 
         // Build all 
         $images = Image::all();
 
-        $image_progress_part = (0.8 / count($images));
+        $image_progress_part = (0.6 / count($images));
 
-        $progress = 0.2;
+        $progress = 0.4;
 
         foreach($images as $image) {
             $image->build();

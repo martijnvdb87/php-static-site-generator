@@ -466,7 +466,7 @@ class Page
             return $page->getIsBuilt();
         }));
 
-        $GLOBALS['progress']->set($total_built / $total_pages);
+        $GLOBALS['progress']->set(($total_built / $total_pages) * 0.2);
 
         $paginate = $this->getPaginate();
 
