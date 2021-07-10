@@ -6,8 +6,6 @@ use Martijnvdb\StaticSiteGenerator\Config;
 
 class Api
 {
-    private $api_dir = __DIR__ . '/../public/api/';
-
     public function __construct()
     {
     }
@@ -22,9 +20,13 @@ class Api
         $api_endpoints = [];
 
         foreach (File::getContent() as $file) {
-            $page_variables = Page::create($file)->generateImages(false)->getTemplateVariables();
+            $page_variables = Page::create($file)->getTemplateVariables();
+            //$page = Page::create($file)->generateImages(false);
+            //$page_variables = $page->getTemplateVariables();
 
             $url = $page_variables['url'];
+
+            //$url = $page_variables['url'];
             $path = explode('/', $url);
             $file = array_pop($path);
 
@@ -67,8 +69,10 @@ class Api
             }
         }
 
-        if(!is_dir($this->api_dir)) {
-            mkdir($this->api_dir);
+        $build_path = Config::get('path.public') . '/' . Config::get('path.api') . '/';
+
+        if(!is_dir($build_path)) {
+            mkdir($build_path, 0777, true);
         }
 
         foreach ($api_endpoints as $url => $data) {
@@ -79,8 +83,8 @@ class Api
             foreach ($path as $part) {
                 $dir = implode('/', array_merge($dir, [$part]));
 
-                if (!file_exists($this->api_dir . $dir)) {
-                    mkdir($this->api_dir . $dir);
+                if (!file_exists($build_path . $dir)) {
+                    mkdir($build_path . $dir);
                 }
             }
 
@@ -91,9 +95,9 @@ class Api
             }
 
             if (empty($url)) {
-                file_put_contents($this->api_dir . '/../api.json', json_encode($data));
+                file_put_contents($build_path . '/../api.json', json_encode($data));
             } else {
-                file_put_contents($this->api_dir . $url . '.json', json_encode($data));
+                file_put_contents($build_path . $url . '.json', json_encode($data));
             }
         }
 

@@ -7,9 +7,9 @@ use Martijnvdb\StaticSiteGenerator\Config;
 
 class File
 {
-    public static function getContent($path = null): array
+    public static function getContent(): array
     {
-        $files = self::getFilesFromPath(Config::get('path.content'), false, true);
+        $files = self::getFilesFromPath(__DIR__ . '/../' . Config::get('path.content'), false, true);
 
         $files_variables = [];
 

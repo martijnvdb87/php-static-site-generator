@@ -12,31 +12,54 @@ use Martijnvdb\StaticSiteGenerator\Image;
 
 class Page
 {
-    private static $pages = [];
+    private static $cache = [];
 
     private $source_path_relative;
     private $source_path_absolute;
+    private $permalink;
 
+    private $url;
     private $variables;
+    private $html;
+    private $template;
+
+    private $is_built = false;
+
+    private $path;
+
+    private $paginate = false;
+    private $paginate_type;
+    private $paginate_amount = 10;
+    private $paginate_skip = 0;
+    private $paginate_url = 'page';
+
+    private $paginate_sort_type = 'date';
+    private $paginate_sort_asc = false;
+
+    private $source_content;
+    private $source_parsed;
+
+    private $template_loader;
 
     public function __construct(string $source_path_relative)
     {
-        $this->setSourcePathRelative($source_path_relative);
-        $this->template_loader = new FilesystemLoader(__DIR__ . '/../' . Config::get('path.templates'));
+        $this->setPath($source_path_relative);
+        $this->template_loader = new FilesystemLoader(Config::get('path.templates'));
     }
 
     public static function create(string $source_path_relative): self
     {
-        if(isset(self::$pages[$source_path_relative])) {
-            return self::$pages[$source_path_relative];
+        if(isset(self::$cache[$source_path_relative])) {
+            return self::$cache[$source_path_relative];
         }
 
         $page = new Page($source_path_relative);
-        self::$pages[$source_path_relative] = $page;
+        self::$cache[$source_path_relative] = $page;
+        
         return $page;
     }
-    
-    private function setSourcePathRelative(string $source_path_relative): self
+
+    private function setPath(string $source_path_relative): self
     {
         $this->source_path_relative = $source_path_relative;
 
@@ -51,15 +74,98 @@ class Page
     private function getSourcePathAbsolute(): string
     {
         if (!isset($this->source_path_absolute)) {
-            $this->source_path_absolute = implode('/', array_filter([
-                __DIR__,
-                '..',
-                Config::get('path.content'),
-                $this->getSourcePathRelative()
-            ]));
+            $this->source_path_absolute = __DIR__ . "/../content/{$this->getSourcePathRelative()}";
         }
 
         return $this->source_path_absolute;
+    }
+
+    private function getSourceContent(): string
+    {
+        if (!isset($this->source_content)) {
+            $this->source_content = file_get_contents($this->getSourcePathAbsolute());
+        }
+
+        return $this->source_content;
+    }
+
+    private function getSourceParsed(): Document
+    {
+        if (!isset($this->source_parsed)) {
+            $parser = new Parser();
+
+            $source_content = $this->getSourceContent();
+
+            $source_content = preg_replace_callback('/\!\[(.+?)\]\((.+?)\)/', function($matches) {
+                return Image::create($matches[2], $matches[1])->getHtml();
+            }, $source_content);
+
+            $this->source_parsed = $parser->parse($source_content);
+        }
+
+        return $this->source_parsed;
+    }
+
+    public function getSkip(): int
+    {
+        return $this->paginate_skip;
+    }
+
+    public function setSkip(int $skip): int
+    {
+        $this->paginate_skip = $skip;
+        return $this->paginate_skip;
+    }
+
+    public static function getAbsoluteUrl(string $url = ''): string
+    {
+        return rtrim(rtrim(Config::get('url'), '/') . '/' . ltrim($url, '/'), '/');
+    }
+
+    public function getUrl(): string
+    {
+        if (isset($this->url)) {
+            return $this->url;
+        }
+
+        // Remove extension
+        $parts = explode('.', $this->getSourcePathRelative());
+        array_pop($parts);
+
+        // Get URL parts
+        $parts = explode('/', implode('.', $parts));
+
+        $variables = $this->getVariables();
+
+        if (isset($variables['url']['relative'])) {
+            if (substr($variables['url']['relative'], 0, 1) === '/') {
+                $parts = [substr($variables['url']['relative'], 1)];
+            } else {
+                array_pop($parts);
+                $parts[] = $variables['url']['relative'];
+            }
+
+            $this->url = implode('/', $parts);
+        } else {
+            if (sizeof($parts) === 1 && $parts[0] === 'index') {
+                array_pop($parts);
+            }
+
+            $this->url = implode('/', $parts);
+        }
+
+        $this->variables['url']['relative'] = $this->url;
+
+        return $this->url;
+    }
+
+    public function getPath(): array
+    {
+        if (!isset($this->path)) {
+            $this->path = explode('/', $this->getUrl());
+        }
+
+        return $this->path;
     }
 
     private function getTemplate(): string
@@ -98,29 +204,49 @@ class Page
     {
         $this->getVariables();
 
-        $base = "{$this->getRelativeUrl()}/{$this->paginate_url}/";
+        $base = "{$this->getUrl()}/{$this->paginate_url}/";
 
         if ($last_page > 1) {
             $this->variables['paginate'] = [
                 'first' => [
                     'number' => 1,
-                    'url' => $this->getRelativeUrl()
+                    'url' => [
+                        'home' => self::getAbsoluteUrl(),
+                        'absolute' => self::getAbsoluteUrl($this->getUrl()),
+                        'relative' => $this->getUrl(),
+                    ]
                 ],
                 'previous' => [
                     'number' => $current_page > 1 ? $current_page - 1 : null,
-                    'url' => $current_page == 2 ? $this->getRelativeUrl() : ($current_page > 1 ? $base . ($current_page - 1) : null)
+                    'url' => [
+                        'home' => self::getAbsoluteUrl(),
+                        'absolute' => self::getAbsoluteUrl($current_page == 2 ? $this->getUrl() : ($current_page > 1 ? $base . ($current_page - 1) : null)),
+                        'relative' => $current_page == 2 ? $this->getUrl() : ($current_page > 1 ? $base . ($current_page - 1) : null),
+                    ]
                 ],
                 'current' => [
                     'number' => $current_page,
-                    'url' => $base . $current_page
+                    'url' => [
+                        'home' => self::getAbsoluteUrl(),
+                        'absolute' => self::getAbsoluteUrl($base . $current_page),
+                        'relative' => $base . $current_page,
+                    ]
                 ],
                 'next' => [
                     'number' => $current_page < $last_page ? $current_page + 1 : null,
-                    'url' => $current_page < $last_page ? $base . ($current_page + 1) : null
+                    'url' => [
+                        'home' => self::getAbsoluteUrl(),
+                        'absolute' => self::getAbsoluteUrl($current_page < $last_page ? $base . ($current_page + 1) : null),
+                        'relative' => $current_page < $last_page ? $base . ($current_page + 1) : null,
+                    ]
                 ],
                 'last' => [
                     'number' => $last_page,
-                    'url' => $base . $last_page
+                    'url' => [
+                        'home' => self::getAbsoluteUrl(),
+                        'absolute' => self::getAbsoluteUrl($base . $last_page),
+                        'relative' => $base . $last_page,
+                    ]
                 ]
             ];
         }
@@ -139,36 +265,44 @@ class Page
 
         return $this;
     }
-    
+
+    public function getDate(): int
+    {
+        $variables = $this->getVariables();
+        return $variables['date'];
+    }
+
     public function getVariables(): array
     {
         if (!isset($this->variables)) {
             $this->variables = (array) $this->getSourceParsed()->getYAML();
 
-            // Create url if no url is given
-            if (!isset($this->variables['url'])) {
-                $parts = explode('.', $this->getSourcePathRelative());
-                array_pop($parts);
+            if (!isset($this->variables['title'])) {
+                $parts = explode('/', $this->getUrl());
+                $title = array_pop($parts);
 
-                $this->variables['url'] = implode('.', $parts);
+                $title = ucwords($title);
+                $title = str_replace('-', ' ', $title);
+
+                $this->variables['title'] = $title;
             }
 
-            // Create title if no title is given
-            if(!isset($this->variables['title'])) {
-                $parts = explode('.', $this->getSourcePathRelative());
-                array_pop($parts);
-
-                $this->variables['title'] = ucfirst(preg_replace('/[-_]/', '', implode('.', $parts)));
-            }
-
-            // Create date if no date is given
             if (!isset($this->variables['date'])) {
-                $this->variables['date'] = filemtime($this->getSourcePathAbsolute());
+                $date = filemtime($this->getSourcePathAbsolute());
+                $this->variables['date'] = $date;
             }
 
             $this->variables['source_path_relative'] = $this->getSourcePathRelative();
-            $this->variables['source_path_absolute'] = $this->getSourcePathAbsolute();
+            
+            $this->variables['url'] = [
+                'url' => [
+                    'home' => self::getAbsoluteUrl(),
+                    'absolute' => self::getAbsoluteUrl($this->getUrl()),
+                    'relative' => $this->getUrl(),
+                ]
+            ];
         }
+
 
         return $this->variables;
     }
@@ -211,8 +345,8 @@ class Page
             'amount' => $this->paginate_amount,
             'skip' => $this->paginate_skip,
             'url' => [
-                // 'home' => self::getAbsoluteUrl(),
-                // 'absolute' => self::getAbsoluteUrl($this->paginate_url),
+                'home' => self::getAbsoluteUrl(),
+                'absolute' => self::getAbsoluteUrl($this->paginate_url),
                 'relative' => $this->paginate_url,
             ],
             'sort' => [
@@ -249,6 +383,7 @@ class Page
 
         foreach ($files as $file) {
             $page = Page::create($file);
+            $page->generateImages(false);
             $pages[] = $page;
         }
 
@@ -288,7 +423,7 @@ class Page
         $amount_pages = ceil((sizeof($children) - $skip) / $paginate['amount']);
         $amount_pages = max($amount_pages, 1);
 
-        $page_url = $this->getRelativeUrl();
+        $page_url = $this->getUrl();
 
         for ($page_num = 1; $page_num <= $amount_pages; $page_num++) {
             $start = ($page_num - 1) * $paginate['amount'] + $skip;
@@ -316,11 +451,11 @@ class Page
         $template = $twig->load($this->getTemplate());
         $content = $template->render($this->getTemplateVariables());
 
-        $url = isset($custom_url) ? $custom_url : $this->getRelativeUrl();
+        $url = isset($custom_url) ? $custom_url : $this->getUrl();
 
         $dirs = explode('/', $url);
 
-        $file_path = [__DIR__ . '/../' . Config::get('path.public')];
+        $file_path = [Config::get('path.public')];
 
         foreach ($dirs as $dir) {
             if (empty($dir)) {
@@ -356,73 +491,20 @@ class Page
         return $this;
     }
 
-    private function getSourceContent(): string
-    {
-        if (!isset($this->source_content)) {
-            $this->source_content = file_get_contents($this->getSourcePathAbsolute());
-        }
-
-        return $this->source_content;
-    }
-
-    private function getSourceParsed(): Document
-    {
-        if (!isset($this->source_parsed)) {
-            $parser = new Parser();
-
-            $source_content = $this->getSourceContent();
-
-            $source_content = preg_replace_callback('/\!\[(.+?)\]\((.+?)\)/', function($matches) {
-                return Image::create($matches[2], $matches[1])->getHtml();
-            }, $source_content);
-
-            $this->source_parsed = $parser->parse($source_content);
-        }
-
-        return $this->source_parsed;
-    }
-
-    public function getSkip(): int
-    {
-        return $this->paginate_skip;
-    }
-
-    public function setSkip(int $skip): int
-    {
-        $this->paginate_skip = $skip;
-        return $this->paginate_skip;
-    }
-
-    public function getAbsoluteUrl(): string
-    {
-        return implode('/', [
-            rtrim(Config::get('url'), '/'),
-            $this->getRelativeUrl()
-        ]);
-    }
-
-    public function getRelativeUrl(): string
-    {
-        $variables = $this->getVariables();
-        return $variables['url'];
-    }
-
-    public function getPath(): array
-    {
-        if (!isset($this->path)) {
-            $this->path = explode('/', $this->getRelativeUrl());
-        }
-
-        return $this->path;
-    }
-
     public function build(): self
     {
+        $total_pages = count(self::$cache);
+        $total_built = count(array_filter(self::$cache, function($page) {
+            return $page->getIsBuilt();
+        }));
+
+        $GLOBALS['progress']->set(($total_built / $total_pages) * 0.2);
+
         $paginate = $this->getPaginate();
 
         $this->setIsBuilt(true);
 
-        if($paginate['paginate']) {
+        if ($paginate['paginate']) {
             return $this->paginatedBuild();
         }
 

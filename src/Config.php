@@ -12,6 +12,7 @@ class Config
     private static $content_path = 'content';
     private static $templates_path = 'templates';
     private static $public_path = 'public';
+    private static $api_path = 'api';
 
     private static function load(): void
     {
@@ -23,7 +24,8 @@ class Config
             foreach([
                 'path.content' => self::$content_path,
                 'path.templates' => self::$templates_path,
-                'path.public' => self::$public_path
+                'path.public' => self::$public_path,
+                'path.api' => self::$api_path,
             ] as $key => $value) {
                 self::set($key, self::get($key) ?? $value);
             }
