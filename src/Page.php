@@ -168,11 +168,32 @@ class Page
         return $this->title;
     }
 
+    private function getType(): ?string
+    {
+        if(!isset($this->type)) {
+            $this->type = $this->getUserSetting('type');
+
+            if(is_null($this->type)) {
+                $parts = explode('.', $this->getSourcePathRelative());
+                array_pop($parts);
+                $parts = explode('/', implode('.', $parts));
+                array_pop($parts);
+
+                if(!empty($parts)) {
+                    $this->type = implode('/', $parts);
+                }
+            }
+        }
+        
+        return $this->type;
+    }
+
     public function getVariables(): array
     {
         print_r([
             'title' => $this->getTitle(),
             'url' => $this->getRelativeUrl(),
+            'type' => $this->getType(),
             'content' => $this->getContent(),
         ]);
         exit();
