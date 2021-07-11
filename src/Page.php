@@ -144,16 +144,34 @@ class Page
             if(is_null($this->relative_url)) {
                 $parts = explode('.', $this->getSourcePathRelative());
                 array_pop($parts);
-                $this->relative_url =implode('.', $parts);
+                $this->relative_url = implode('.', $parts);
             }
         }
         
         return $this->relative_url;
     }
 
+    private function getTitle(): string
+    {
+        if(!isset($this->title)) {
+            $this->title = $this->getUserSetting('title');
+
+            if(is_null($this->title)) {
+                $parts = explode('.', $this->getSourcePathRelative());
+                array_pop($parts);
+                $title = array_pop(explode('/', implode('.', $parts)));
+
+                $this->title = ucfirst(str_replace('-', ' ', $title));
+            }
+        }
+        
+        return $this->title;
+    }
+
     public function getVariables(): array
     {
         print_r([
+            'title' => $this->getTitle(),
             'url' => $this->getRelativeUrl(),
             'content' => $this->getContent(),
         ]);
