@@ -20,6 +20,8 @@ $cli = (new Cli('Static site generator', '0.1.0'))
         // Build HTML files
         Html::create()->build();
 
+        exit();
+
         $GLOBALS['progress']->set(0.2);
 
         // Build Manifest file
