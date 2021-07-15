@@ -14,9 +14,10 @@ class Page
 {
     private static $pages = [];
 
-    private $type;
     private $template;
     private $title;
+    private $type;
+    private $date;
     private $content;
 
     private $user_settings;
@@ -133,7 +134,7 @@ class Page
     {
         $user_settings = $this->getUserSettings();
 
-        return $user_settings[$key];
+        return $user_settings[$key] ?? null;
     }
 
     private function getRelativeUrl(): string
@@ -188,15 +189,36 @@ class Page
         return $this->type;
     }
 
+    private function getDate(): string
+    {
+        if(!isset($this->date)) {
+            $date = $this->getUserSetting('date');
+
+            if(is_null($date)) {
+                $date = filemtime($this->getSourcePathAbsolute());
+            }
+
+            $this->date = strtotime($date);
+        }
+
+        return $this->date;
+    }
+
     public function getVariables(): array
     {
-        print_r([
+        $variables = [
             'title' => $this->getTitle(),
             'url' => $this->getRelativeUrl(),
             'type' => $this->getType(),
+            'date' => $this->getDate(),
             'content' => $this->getContent(),
-        ]);
-        exit();
+            'source_path_relative' => $this->getSourcePathRelative(),
+            'source_path_absolute' => $this->getSourcePathAbsolute(),
+        ];
+
+        print_r($variables);
+
+        return $variables;
     }
 
     public function build(): self
