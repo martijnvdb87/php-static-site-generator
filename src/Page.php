@@ -194,11 +194,15 @@ class Page
         if(!isset($this->date)) {
             $date = $this->getUserSetting('date');
 
-            if(is_null($date)) {
+            if(empty($date)) {
                 $date = filemtime($this->getSourcePathAbsolute());
             }
 
-            $this->date = strtotime($date);
+            if(((string) (int) $date === $date) && ($date <= PHP_INT_MAX) && ($date >= ~PHP_INT_MAX)) {
+                $date = strtotime($date);
+            }
+
+            $this->date = $date;
         }
 
         return $this->date;
