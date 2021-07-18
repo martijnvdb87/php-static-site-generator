@@ -208,6 +208,34 @@ class Page
         return $this->date;
     }
 
+    public function getTemplate(): ?string
+    {
+        if(!isset($this->template)) {
+            $template = $this->getUserSetting('template');
+
+            if(!empty($template) && substr($template, -5) !== '.html') {
+                $template .= '.html';
+            }
+
+            if(empty($template)) {
+                $parts = explode('/', $this->getSourcePathRelative());
+                array_pop($parts);
+    
+                if(sizeof($parts) > 0) {
+                    $template = implode('.', $parts) . '.html';
+                }
+            }
+            
+            if(empty($template) || !file_exists(Config::get('path.templates') . "/{$template}")) {
+                $template = 'index.html';
+            }
+
+            $this->template = $template;
+        }
+
+        return $this->template;
+    }
+
     public function getVariables(): array
     {
         $variables = [
@@ -216,6 +244,7 @@ class Page
             'type' => $this->getType(),
             'date' => $this->getDate(),
             'content' => $this->getContent(),
+            'template' => $this->getTemplate(),
             'source_path_relative' => $this->getSourcePathRelative(),
             'source_path_absolute' => $this->getSourcePathAbsolute(),
         ];
