@@ -13,7 +13,7 @@ $cli = (new Cli('Static site generator', '0.1.0'))
     ->add(function ($input, $output) {
         $GLOBALS['progress'] = Progress::new();
         $GLOBALS['progress']->start();
-        
+
         // Reset public directory
         File::resetPublicDir();
 
@@ -26,10 +26,10 @@ $cli = (new Cli('Static site generator', '0.1.0'))
 
         // Build Manifest file
         Manifest::create()->build();
-        
+
         // Build API files
         Api::create()->build();
-        
+
         $GLOBALS['progress']->set(0.4);
 
         // Build all 
@@ -39,12 +39,12 @@ $cli = (new Cli('Static site generator', '0.1.0'))
 
         $progress = 0.4;
 
-        foreach($images as $image) {
+        foreach ($images as $image) {
             $image->build();
             $progress += $image_progress_part;
             $GLOBALS['progress']->set($progress);
         }
-        
+
         $GLOBALS['progress']->set(1);
         $GLOBALS['progress']->stop();
     })

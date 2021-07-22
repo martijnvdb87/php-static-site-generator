@@ -13,7 +13,7 @@ class File
 
         $files_variables = [];
 
-        foreach($files as $file) {
+        foreach ($files as $file) {
             $variables = Page::create($file)->getVariables();
 
             $files_variables[] = $variables;

@@ -71,7 +71,7 @@ class Api
 
         $build_path = Config::get('path.public') . '/' . Config::get('path.api') . '/';
 
-        if(!is_dir($build_path)) {
+        if (!is_dir($build_path)) {
             mkdir($build_path, 0777, true);
         }
 

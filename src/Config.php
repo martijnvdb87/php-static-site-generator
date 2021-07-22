@@ -8,7 +8,7 @@ class Config
 {
     private static $path = 'config.yaml';
     private static $config = null;
-    
+
     private static $content_path = 'content';
     private static $templates_path = 'templates';
     private static $public_path = 'public';
@@ -16,12 +16,12 @@ class Config
 
     private static function load(): void
     {
-        if(!isset(self::$config)) {
-            if(file_exists(self::$path)) {
+        if (!isset(self::$config)) {
+            if (file_exists(self::$path)) {
                 self::$config = Yaml::parse(file_get_contents(self::$path)) ?? [];
             }
 
-            foreach([
+            foreach ([
                 'path.content' => self::$content_path,
                 'path.templates' => self::$templates_path,
                 'path.public' => self::$public_path,
@@ -39,9 +39,9 @@ class Config
         $parts = explode('.', $key);
 
         $config = self::$config;
-        
-        while($part = array_shift($parts)) {
-            if(!isset($config[$part])) {
+
+        while ($part = array_shift($parts)) {
+            if (!isset($config[$part])) {
                 return null;
             }
 
@@ -57,14 +57,14 @@ class Config
         self::load();
 
         $data = &self::$config;
-        
+
         $parts = explode('.', $key);
 
-        foreach($parts as $part) {
-            if(!isset($data[$part])) {
+        foreach ($parts as $part) {
+            if (!isset($data[$part])) {
                 $data[$part] = [];
             }
-            
+
             $data = &$data[$part];
         }
 
