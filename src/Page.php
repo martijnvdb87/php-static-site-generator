@@ -34,6 +34,7 @@ class Page
     private $template_loader;
 
     private $paginate;
+    private $paginate_items;
 
     public function __construct(string $source_path_relative)
     {
@@ -179,7 +180,7 @@ class Page
         return $this->title;
     }
 
-    private function getType(): ?string
+    public function getType(): ?string
     {
         if(!isset($this->type)) {
             $this->type = $this->getUserSetting('type');
@@ -246,6 +247,24 @@ class Page
         return $this->template;
     }
 
+    private function getPaginateItems($type, $sort = null, $asc = false): array
+    {
+        if(!isset($this->paginate_items)) {
+            $this->paginate_items = [];
+            $files = File::getContent($sort, $asc);
+
+            foreach($files as $file) {
+                $item = Page::create($file);
+
+                if($item->getType() === $type) {
+                    $this->paginate_items[] = $item->getVariables();
+                }
+            }
+        }
+        
+        return $this->paginate_items;
+    }
+
     private function getPaginate()
     {
         if(!isset($this->paginate)) {
@@ -257,8 +276,9 @@ class Page
                     'url' => $this->getUserSetting('paginate.url') ?? 'page',
                     'sort' => [
                         'type' => $this->getUserSetting('paginate.sort.type') ?? 'date',
-                        'asc' => $this->getUserSetting('paginate.sort.asc') ?? false,
-                    ]
+                        'asc' => (bool) $this->getUserSetting('paginate.sort.asc'),
+                    ],
+                    'items' => $this->getPaginateItems($this->getUserSetting('paginate.type'), $this->getUserSetting('paginate.sort.type') ?? 'date', (bool) $this->getUserSetting('paginate.sort.asc'))
                 ];
             }
         }

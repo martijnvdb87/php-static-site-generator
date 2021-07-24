@@ -7,7 +7,7 @@ use Martijnvdb\StaticSiteGenerator\Config;
 
 class File
 {
-    public static function getContent(): array
+    public static function getContent($sort = 'date', $asc = false): array
     {
         $files = self::getFilesFromPath(__DIR__ . '/../' . Config::get('path.content'), false, true);
 
@@ -19,11 +19,17 @@ class File
             $files_variables[] = $variables;
         }
 
-        $dates = array_column($files_variables, 'date');
+        $dates = array_column($files_variables, $sort);
 
         array_multisort($files_variables, SORT_DESC, $dates);
 
-        return array_column($files_variables, 'source_path_relative');
+        $items = array_column($files_variables, 'source_path_relative');
+
+        if($asc) {
+            $items = array_reverse($items);
+        }
+
+        return $items;
     }
 
     private static function getFilesFromPath($path, $show_dirs = false, $hide_hidden = false, $orignal_path = null): array
