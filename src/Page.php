@@ -33,7 +33,7 @@ class Page
 
     private $template_loader;
 
-    private $variables;
+    private $paginate;
 
     public function __construct(string $source_path_relative)
     {
@@ -133,8 +133,18 @@ class Page
     private function getUserSetting(string $key)
     {
         $user_settings = $this->getUserSettings();
+        
+        $parts = explode('.', $key);
 
-        return $user_settings[$key] ?? null;
+        while ($part = array_shift($parts)) {
+            if (!isset($user_settings[$part])) {
+                return null;
+            }
+
+            $user_settings = $user_settings[$part];
+        }
+
+        return $user_settings;
     }
 
     private function getRelativeUrl(): string
@@ -208,7 +218,7 @@ class Page
         return $this->date;
     }
 
-    public function getTemplate(): ?string
+    private function getTemplate(): ?string
     {
         if(!isset($this->template)) {
             $template = $this->getUserSetting('template');
@@ -236,6 +246,26 @@ class Page
         return $this->template;
     }
 
+    private function getPaginate()
+    {
+        if(!isset($this->paginate)) {
+            if($this->getUserSetting('paginate') && $this->getUserSetting('paginate.type')) {
+                $this->paginate = [
+                    'type' => $this->getUserSetting('paginate.type'),
+                    'amount' => $this->getUserSetting('paginate.amount') ?? 10,
+                    'skip' => $this->getUserSetting('paginate.skip') ?? 0,
+                    'url' => $this->getUserSetting('paginate.url') ?? 'page',
+                    'sort' => [
+                        'type' => $this->getUserSetting('paginate.sort.type') ?? 'date',
+                        'asc' => $this->getUserSetting('paginate.sort.asc') ?? false,
+                    ]
+                ];
+            }
+        }
+
+        return $this->paginate;
+    }
+
     public function getVariables(): array
     {
         $variables = [
@@ -247,6 +277,7 @@ class Page
             'template' => $this->getTemplate(),
             'source_path_relative' => $this->getSourcePathRelative(),
             'source_path_absolute' => $this->getSourcePathAbsolute(),
+            'paginate' => $this->getPaginate()
         ];
 
         print_r($variables);
