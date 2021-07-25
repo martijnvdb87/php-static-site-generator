@@ -36,6 +36,8 @@ class Page
     private $paginate;
     private $paginate_items;
 
+    private $is_paginate_item = false;
+
     public function __construct(string $source_path_relative)
     {
         $this->setSourcePathRelative($source_path_relative);
@@ -247,14 +249,21 @@ class Page
         return $this->template;
     }
 
-    private function getPaginateItems($type, $sort = null, $asc = false): array
+    private function isPaginateItem(bool $is_paginate_item = true): self
+    {
+        $this->is_paginate_item = $is_paginate_item;
+
+        return $this;
+    }
+
+    private function getPaginateItems(string $type, ?string $sort = null, bool $asc = false): array
     {
         if(!isset($this->paginate_items)) {
             $this->paginate_items = [];
             $files = File::getContent($sort, $asc);
 
             foreach($files as $file) {
-                $item = Page::create($file);
+                $item = Page::create($file)->isPaginateItem();
 
                 if($item->getType() === $type) {
                     $this->paginate_items[] = $item->getVariables();
@@ -296,11 +305,12 @@ class Page
             'content' => $this->getContent(),
             'template' => $this->getTemplate(),
             'source_path_relative' => $this->getSourcePathRelative(),
-            'source_path_absolute' => $this->getSourcePathAbsolute(),
-            'paginate' => $this->getPaginate()
+            'source_path_absolute' => $this->getSourcePathAbsolute()
         ];
 
-        print_r($variables);
+        if(!$this->is_paginate_item) {
+            $variables['paginate'] = $this->getPaginate();
+        }
 
         return $variables;
     }
