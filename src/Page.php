@@ -314,9 +314,4 @@ class Page
 
         return $variables;
     }
-
-    public function build(): self
-    {
-        return $this;
-    }
 }

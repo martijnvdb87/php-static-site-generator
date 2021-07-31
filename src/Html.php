@@ -20,7 +20,7 @@ class Html
         $files = File::getContent();
         
         foreach ($files as $file) {
-            Page::create($file)->build();
+            Page::create($file);
         }
 
         return $this;
