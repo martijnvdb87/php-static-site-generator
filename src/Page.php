@@ -8,6 +8,7 @@ use Mni\FrontYAML\Parser;
 use Mni\FrontYAML\Document;
 
 use Martijnvdb\StaticSiteGenerator\Config;
+use Martijnvdb\StaticSiteGenerator\File;
 use Martijnvdb\StaticSiteGenerator\Image;
 
 class Page
@@ -45,13 +46,27 @@ class Page
 
     public static function create(string $source_path_relative): self
     {
-        if(isset(self::$pages[$source_path_relative])) {
-            return self::$pages[$source_path_relative];
+        $pages = self::getAll();
+
+        if(isset($pages[$source_path_relative])) {
+            return $pages[$source_path_relative];
         }
 
         $page = new Page($source_path_relative);
-        self::$pages[$source_path_relative] = $page;
         return $page;
+    }
+
+    public static function getAll(): array
+    {
+        if(empty(self::$pages)) {
+            $content_files = File::getContent();
+
+            foreach ($content_files as $file) {
+                self::$pages[$file] = new self($file);
+            }
+        }
+
+        return self::$pages;
     }
 
     private function getTemplateLoader(): ?FilesystemLoader
@@ -259,15 +274,29 @@ class Page
     private function getPaginateItems(string $type, ?string $sort = null, bool $asc = false): array
     {
         if(!isset($this->paginate_items)) {
+            
             $this->paginate_items = [];
-            $files = File::getContent($sort, $asc);
+            
+            $pages = self::getAll();
 
-            foreach($files as $file) {
-                $item = Page::create($file)->isPaginateItem();
+            $pages_variables = [];
 
-                if($item->getType() === $type) {
-                    $this->paginate_items[] = $item->getVariables();
+            foreach($pages as $page) {
+                if($page->getType() === $type) {                    
+                    $variables = $page->getVariables();
+                    $variables['self'] = $page;
+                    $pages_variables[] = $variables;
                 }
+            }
+    
+            $sort_item = array_column($pages_variables, $sort);
+    
+            array_multisort($pages_variables, SORT_DESC, $sort_item);
+    
+            $this->paginate_items = array_column($pages_variables, 'self');
+    
+            if($asc) {
+                $this->paginate_items = array_reverse($this->paginate_items);
             }
         }
         
@@ -305,12 +334,9 @@ class Page
             'content' => $this->getContent(),
             'template' => $this->getTemplate(),
             'source_path_relative' => $this->getSourcePathRelative(),
-            'source_path_absolute' => $this->getSourcePathAbsolute()
+            'source_path_absolute' => $this->getSourcePathAbsolute(),
+            'paginate' => $this->getPaginate()
         ];
-
-        if(!$this->is_paginate_item) {
-            $variables['paginate'] = $this->getPaginate();
-        }
 
         return $variables;
     }

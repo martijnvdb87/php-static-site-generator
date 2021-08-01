@@ -20,7 +20,9 @@ class Html
         $files = File::getContent();
         
         foreach ($files as $file) {
-            Page::create($file);
+            $page = Page::create($file);
+
+            print_r($page->getVariables());
         }
 
         return $this;

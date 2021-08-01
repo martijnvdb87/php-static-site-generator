@@ -7,29 +7,15 @@ use Martijnvdb\StaticSiteGenerator\Config;
 
 class File
 {
-    public static function getContent($sort = 'date', $asc = false): array
+    private static $content = [];
+
+    public static function getContent(): array
     {
-        $files = self::getFilesFromPath(__DIR__ . '/../' . Config::get('path.content'), false, true);
-
-        $files_variables = [];
-
-        foreach ($files as $file) {
-            $variables = Page::create($file)->getVariables();
-
-            $files_variables[] = $variables;
+        if(empty(self::$content)) {
+            self::$content = self::getFilesFromPath(__DIR__ . '/../' . Config::get('path.content'), false, true);
         }
 
-        $dates = array_column($files_variables, $sort);
-
-        array_multisort($files_variables, SORT_DESC, $dates);
-
-        $items = array_column($files_variables, 'source_path_relative');
-
-        if($asc) {
-            $items = array_reverse($items);
-        }
-
-        return $items;
+        return self::$content;
     }
 
     private static function getFilesFromPath($path, $show_dirs = false, $hide_hidden = false, $orignal_path = null): array

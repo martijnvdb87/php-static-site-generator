@@ -7,7 +7,7 @@ paginate:
     skip: 0
     url: page
     sort: 
-        type: title
+        type: date
         asc: false
 ---
 # Blog
