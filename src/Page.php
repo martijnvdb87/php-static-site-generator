@@ -2,8 +2,6 @@
 
 namespace Martijnvdb\StaticSiteGenerator;
 
-use Twig\Loader\FilesystemLoader;
-use Twig\Environment;
 use Mni\FrontYAML\Parser;
 use Mni\FrontYAML\Document;
 
@@ -67,15 +65,6 @@ class Page
         }
 
         return self::$pages;
-    }
-
-    private function getTemplateLoader(): ?FilesystemLoader
-    {
-        if(!isset($this->template_loader)) {
-            $this->template_loader = new FilesystemLoader(__DIR__ . '/../' . Config::get('path.templates'));
-        }
-
-        return $this->template_loader;
     }
     
     private function setSourcePathRelative(string $source_path_relative): self
@@ -165,7 +154,7 @@ class Page
         return $user_settings;
     }
 
-    private function getRelativeUrl(): string
+    public function getRelativeUrl(): string
     {
         if(!isset($this->relative_url)) {
             $this->relative_url = $this->getUserSetting('url');
@@ -236,7 +225,7 @@ class Page
         return $this->date;
     }
 
-    private function getTemplate(): ?string
+    public function getTemplate(): ?string
     {
         if(!isset($this->template)) {
             $template = $this->getUserSetting('template');
