@@ -32,6 +32,10 @@ class Html
     public function build(): self
     {
         $files = File::getContent();
+
+        $percentage_per_file = 0.2 / count($files);
+        $start_percentage = 0;
+        $current_percentage = $start_percentage;
         
         foreach ($files as $file) {
             $page = Page::create($file);
@@ -65,6 +69,10 @@ class Html
             $build_url = implode('/', $file_path);
 
             file_put_contents($build_url, $content);
+
+            $current_percentage += $percentage_per_file;
+
+            $GLOBALS['progress']->set($current_percentage);
         }
 
         return $this;
