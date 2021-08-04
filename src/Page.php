@@ -313,6 +313,10 @@ class Page
         return $this->paginate;
     }
 
+    public function hasPaginate() {
+        return !empty($this->getPaginate());
+    }
+
     public function getVariables(): array
     {
         $variables = [
