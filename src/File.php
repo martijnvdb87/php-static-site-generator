@@ -11,7 +11,7 @@ class File
 
     public static function getContent(): array
     {
-        if(empty(self::$content)) {
+        if (empty(self::$content)) {
             self::$content = self::getFilesFromPath(__DIR__ . '/../' . Config::get('path.content'), false, true);
         }
 
