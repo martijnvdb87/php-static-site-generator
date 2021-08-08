@@ -163,6 +163,10 @@ class Page
                 $parts = explode('.', $this->getSourcePathRelative());
                 array_pop($parts);
                 $this->relative_url = implode('.', $parts);
+
+                if($this->relative_url === 'index') {
+                    $this->relative_url = '';
+                }
             }
         }
         

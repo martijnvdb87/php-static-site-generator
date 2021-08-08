@@ -42,7 +42,7 @@ class Html
         $file_path = [Config::get('path.public')];
 
         foreach ($dirs as $dir) {
-            if (empty($dir) || $dir === 'index') {
+            if (empty($dir)) {
                 continue;
             }
 
