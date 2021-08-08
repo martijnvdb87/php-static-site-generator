@@ -2,7 +2,7 @@
 {{ include('_page-header.html') }}
 {{ include('_header.html') }}
 
-{% for item in paginate.loop %}
+{% for item in paginate.items %}
     <h2><a href="{{ item.url }}">{{ item.title }}</a></h2>
     <h6>{{ item.date }}</h6>
     <div>{{ item.content|raw }}</div>

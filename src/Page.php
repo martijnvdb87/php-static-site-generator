@@ -173,6 +173,21 @@ class Page
         return $this->relative_url;
     }
 
+    public function getAbsoluteUrl(): string
+    {
+        if(!isset($this->absolute_url)) {
+            $url = [Config::get('url')];
+
+            if(!empty($this->getRelativeUrl())) {
+                $url[] = $this->getRelativeUrl();
+            }
+
+            $this->absolute_url = implode('/', $url);
+        }
+        
+        return $this->absolute_url;
+    }
+
     private function getTitle(): string
     {
         if(!isset($this->title)) {
@@ -325,14 +340,15 @@ class Page
     {
         $variables = [
             'title' => $this->getTitle(),
-            'url' => $this->getRelativeUrl(),
+            'url' => $this->getAbsoluteUrl(),
             'type' => $this->getType(),
             'date' => $this->getDate(),
             'content' => $this->getContent(),
             'template' => $this->getTemplate(),
             'source_path_relative' => $this->getSourcePathRelative(),
             'source_path_absolute' => $this->getSourcePathAbsolute(),
-            'paginate' => $this->getPaginate()
+            'paginate' => $this->getPaginate(),
+            'homepage' => Config::get('url'),
         ];
 
         return $variables;

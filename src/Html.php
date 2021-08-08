@@ -82,7 +82,7 @@ class Html
                 $current_child = ($i * $amount_per_page) + $x + $skip;
 
                 if (isset($paginate_items[$current_child])) {
-                    $child_variables['paginate']['items'][] = $paginate_items[$current_child];
+                    $child_variables['paginate']['items'][] = $paginate_items[$current_child]->getVariables();
                 }
             }
 
