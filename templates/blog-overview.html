@@ -8,12 +8,12 @@
     <div>{{ item.content|raw }}</div>
 {% endfor %}
 
-{% if paginate.previous.url %}
-<div><a href="{{ paginate.previous.url }}">Previous</a></div>
+{% if previous_page %}
+<div><a href="{{ previous_page }}">Previous</a></div>
 {% endif %}
 
-{% if paginate.next.url %}
-<div><a href="{{ paginate.next.url }}">Next</a></div>
+{% if next_page_url %}
+<div><a href="{{ next_page }}">Next</a></div>
 {% endif %}
 
 {{ include('_footer.html') }}

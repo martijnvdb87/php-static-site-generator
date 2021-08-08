@@ -73,17 +73,34 @@ class Html
 
         $total_pages = ceil($total_items / $amount_per_page);
 
-        for ($i = 0; $i < $total_pages; $i++) {
+        for ($current_page = 1; $current_page <= $total_pages; $current_page++) {
 
             $child_variables = $page->getVariables();
             $child_variables['paginate']['items'] = [];
 
-            for ($x = 0; $x < count($paginate_items); $x++) {
-                $current_child = ($i * $amount_per_page) + $x + $skip;
+            for ($current_pagina_item = 0; $current_pagina_item < count($paginate_items); $current_pagina_item++) {
+                if($amount_per_page <= $current_pagina_item) {
+                    break;
+                }
+
+                $current_child = (($current_page - 1) * $amount_per_page) + $current_pagina_item + $skip;
 
                 if (isset($paginate_items[$current_child])) {
-                    $child_variables['paginate']['items'][] = $paginate_items[$current_child]->getVariables();
+
+                    $child_page_item = $paginate_items[$current_child]->getVariables();
+                    $child_variables['paginate']['items'][] = $child_page_item;
                 }
+            }
+
+            if($current_page == 2) {
+                $child_variables['previous_page'] = $page->getAbsoluteUrl();
+
+            } else if($current_page > 2) {
+                $child_variables['previous_page'] = $page->getAbsoluteUrl() . '/' . Config::get('path.page')  . '/' . ($current_page - 1);
+            }
+            
+            if($current_page < $total_pages) {
+                $child_variables['next_page'] = $page->getAbsoluteUrl() . '/' . Config::get('path.page')  . '/' . ($current_page + 1);
             }
 
             $twig = new Environment(self::getTemplateLoader());
@@ -94,9 +111,9 @@ class Html
 
             $dirs = explode('/', $url);
 
-            if ($i > 0) {
-                $dirs[] = 'page';
-                $dirs[] = ($i + 1);
+            if ($current_page > 1) {
+                $dirs[] = Config::get('path.page');
+                $dirs[] = $current_page;
             }
 
             $file_path = [Config::get('path.public')];
