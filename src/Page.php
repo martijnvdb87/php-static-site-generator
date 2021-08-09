@@ -296,10 +296,8 @@ class Page
                     $pages_variables[] = $variables;
                 }
             }
-    
-            $sort_item = array_column($pages_variables, $sort);
-    
-            array_multisort($pages_variables, SORT_DESC, $sort_item);
+
+            array_multisort(array_column($pages_variables, $sort), SORT_DESC, SORT_REGULAR, $pages_variables);
     
             $this->paginate_items = array_column($pages_variables, 'self');
     

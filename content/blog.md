@@ -3,7 +3,7 @@ title: Blog
 template: blog-overview
 paginate:
     type: blog
-    amount: 1
+    amount: 3
     skip: 0
     url: page
     sort: 
