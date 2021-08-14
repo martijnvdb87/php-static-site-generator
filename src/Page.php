@@ -74,7 +74,7 @@ class Page
         return $this;
     }
 
-    private function getSourcePathRelative(): string
+    public function getSourcePathRelative(): string
     {
         return $this->source_path_relative;
     }

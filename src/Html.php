@@ -31,15 +31,75 @@ class Html
 
     private function buildSingle(Page $page): void
     {
-        $twig = new Environment(self::getTemplateLoader());
-        $template = $twig->load($page->getTemplate());
-        $content = $template->render($page->getVariables());
+        $variables = $page->getVariables();
 
         $url = isset($custom_url) ? $custom_url : $page->getRelativeUrl();
 
         $dirs = explode('/', $url);
 
         $file_path = [Config::get('path.public')];
+
+        $page->getType();
+
+        $files = File::getContent();
+
+        if(!empty($page->getType())) {
+            $same_type_items = [];
+            $sort = null;
+    
+            foreach($files as $file) {
+                $file_page = Page::create($file);
+    
+                if($file_page->getType() === $page->getType()) {
+                    $same_type_items[] = $file_page->getVariables();
+                }
+
+                if(empty($sort)) {
+                    $file_page_variables = $file_page->getVariables();
+                    
+                    if(
+                        isset($file_page_variables['paginate']) &&
+                        isset($file_page_variables['paginate']['type']) &&
+                        isset($file_page_variables['paginate']['sort']) &&
+                        $file_page_variables['paginate']['type'] === $page->getType()
+                    ) {
+                        $sort = $file_page_variables['paginate']['sort'];
+                    }
+                }
+            }
+
+            if(!empty($sort)) {
+                array_multisort(array_column($same_type_items, $sort['type']), SORT_DESC, SORT_REGULAR, $same_type_items);
+
+                if($sort['asc']) {
+                    $same_type_items = array_reverse($same_type_items);
+                }
+            }
+            
+            $found_current = false;
+            $items_before_current = [];
+            $items_after_current = [];
+
+            foreach($same_type_items as $item) {
+                if($item['source_path_relative'] === $page->getSourcePathRelative()) {
+                    $found_current = true;
+                    continue;
+                }
+
+                if($found_current) {
+                    $items_after_current[] = $item;
+                    
+                } else {
+                    $items_before_current[] = $item;
+                }
+            }
+
+            $variables['next_item'] = count($items_after_current) > 0 ? $items_after_current[0] : null;
+            $variables['previous_item'] = count($items_before_current) > 0 ? $items_before_current[(count($items_before_current) - 1)] : null;
+
+            $variables['items_before_current'] = $items_before_current;
+            $variables['items_after_current'] = $items_after_current;
+        }
 
         foreach ($dirs as $dir) {
             if (empty($dir)) {
@@ -58,6 +118,10 @@ class Html
         $file_path[] = 'index.html';
 
         $build_url = implode('/', $file_path);
+        
+        $twig = new Environment(self::getTemplateLoader());
+        $template = $twig->load($page->getTemplate());
+        $content = $template->render($variables);
 
         file_put_contents($build_url, $content);
     }
