@@ -46,6 +46,7 @@ class Html
         if(!empty($page->getType())) {
             $same_type_items = [];
             $sort = null;
+            $main_type_item = null;
     
             foreach($files as $file) {
                 $file_page = Page::create($file);
@@ -54,7 +55,7 @@ class Html
                     $same_type_items[] = $file_page->getVariables();
                 }
 
-                if(empty($sort)) {
+                if(empty($main_type_item)) {
                     $file_page_variables = $file_page->getVariables();
                     
                     if(
@@ -63,6 +64,7 @@ class Html
                         isset($file_page_variables['paginate']['sort']) &&
                         $file_page_variables['paginate']['type'] === $page->getType()
                     ) {
+                        $main_type_item = $file_page->getVariables();
                         $sort = $file_page_variables['paginate']['sort'];
                     }
                 }
@@ -92,6 +94,10 @@ class Html
                 } else {
                     $items_before_current[] = $item;
                 }
+            }
+
+            if(!empty($main_type_item)) {
+                $variables['overview_page'] = $main_type_item;
             }
 
             $variables['next_item'] = count($items_after_current) > 0 ? $items_after_current[0] : null;

@@ -7,6 +7,18 @@
 
 <div>{{ content|raw }}</div>
 
+{% if previous_item %}
+<div><a href="{{ previous_item.url }}">Previous</a></div>
+{% endif %}
+
+{% if overview_page %}
+<div><a href="{{ overview_page.url }}">Overview</a></div>
+{% endif %}
+
+{% if next_item %}
+<div><a href="{{ next_item.url }}">Next</a></div>
+{% endif %}
+
 {{ include('_footer.html') }}
 {{ include('_page-footer.html') }}
 {% endapply %}
