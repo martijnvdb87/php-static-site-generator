@@ -346,7 +346,7 @@ class Page
             'source_path_relative' => $this->getSourcePathRelative(),
             'source_path_absolute' => $this->getSourcePathAbsolute(),
             'paginate' => $this->getPaginate(),
-            'homepage' => Config::get('url'),
+            'site_url' => Config::get('url'),
         ];
 
         return $variables;
