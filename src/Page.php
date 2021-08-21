@@ -339,6 +339,7 @@ class Page
         $variables = [
             'title' => $this->getTitle(),
             'url' => $this->getAbsoluteUrl(),
+            'relative_url' => $this->getRelativeUrl(),
             'type' => $this->getType(),
             'date' => $this->getDate(),
             'content' => $this->getContent(),
