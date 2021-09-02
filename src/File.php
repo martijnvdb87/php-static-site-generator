@@ -62,8 +62,16 @@ class File
         $files = self::getFilesFromPath(Config::get('path.public'), true);
 
         foreach ($files as $file) {
+            if(substr($file, 0, strlen(Config::get('path.images'))) === Config::get('path.images')) {
+                continue;
+            }
+
             if (is_dir(Config::get('path.public') . '/' . $file)) {
-                rmdir(Config::get('path.public') . '/' . $file);
+                $dir_files = self::getFilesFromPath(Config::get('path.public') . '/' . $file, true);
+
+                if(count($dir_files) === 0) {
+                    rmdir(Config::get('path.public') . '/' . $file);
+                }
             } else {
                 unlink(Config::get('path.public') . '/' . $file);
             }

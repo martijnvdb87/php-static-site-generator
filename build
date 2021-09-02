@@ -30,7 +30,6 @@ $cli = (new Cli('Static site generator', '0.1.0'))
         
         // Build API files
         Api::create()->build();
-        exit();
 
         $GLOBALS['progress']->set(0.4);
 

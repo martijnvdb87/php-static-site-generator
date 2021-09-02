@@ -66,7 +66,7 @@ class Image
                 break;
             }
 
-            $uri = Config::get('url') . "/assets/images/{$this->id}-{$width}w.{$this->source_extension}";
+            $uri = Config::get('url') . "/" . Config::get('path.images') . "/{$this->id}-{$width}w.{$this->source_extension}";
             $output .= "<source srcset='$uri' media='(max-width: {$width}px)'>";
         }
 
@@ -83,8 +83,11 @@ class Image
                 break;
             }
 
-            $export_path = self::$public_path . "/assets/images/{$this->id}-{$width}w.{$this->source_extension}";
-            ImageResize::get($this->source_path)->setWidth($width)->export($export_path);
+            $export_path = self::$public_path . "/" . Config::get('path.images') . "/{$this->id}-{$width}w.{$this->source_extension}";
+
+            if(!file_exists($export_path)) {
+                ImageResize::get($this->source_path)->setWidth($width)->export($export_path);
+            }
         }
 
         return $this;
