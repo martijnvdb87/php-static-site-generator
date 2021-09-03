@@ -97,8 +97,24 @@ class Html
             }
 
             if(!empty($main_type_item)) {
-                $variables['overview_page'] = $main_type_item;
+                $variables['pagetype_item'] = $main_type_item;
+                $variables['overview_page'] = $main_type_item['url'];
+
+                if(isset($main_type_item['paginate']['amount'])) {
+                    $type_item_skip = isset($main_type_item['paginate']['skip']) ? intval($main_type_item['paginate']['skip']) : 0;
+
+                    $type_item_count = intval(count($same_type_items) - $type_item_skip);
+
+                    $item_current_page = ceil(($type_item_count - count($items_after_current)) / intval($main_type_item['paginate']['amount']));
+
+                    if($item_current_page == 1) {
+                        $variables['overview_page'] = $main_type_item['url'];
+                    } else {
+                        $variables['overview_page'] = $main_type_item['url'] . "/" . Config::get('path.page') . "/" . $item_current_page;
+                    }
+                }
             }
+
 
             $variables['next_item'] = count($items_after_current) > 0 ? $items_after_current[0] : null;
             $variables['previous_item'] = count($items_before_current) > 0 ? $items_before_current[(count($items_before_current) - 1)] : null;
