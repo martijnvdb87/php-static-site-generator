@@ -40,15 +40,15 @@ class Api
             }
 
 
-            $api_endpoints[$url]['url'] = Config::get('url') . '/' . $page_variables['url'];
-            $item_data['url'] = Config::get('url') . '/' . $page_variables['url'];
+            $api_endpoints[$url]['url'] = $page_variables['url'];
+            $item_data['url'] = $page_variables['url'];
 
             if (empty($url)) {
                 $api_endpoints[$url]['resource'] = Config::get('url') . '/api.json';
                 $item_data['resource'] = Config::get('url') . '/api.json';
             } else {
-                $api_endpoints[$url]['resource'] = Config::get('url') . '/api/' . $page_variables['url'] . '.json';
-                $item_data['resource'] = Config::get('url') . '/api/' . $page_variables['url'] . '.json';
+                $api_endpoints[$url]['resource'] = Config::get('url') . '/api/' . $page_variables['relative_url'] . '.json';
+                $item_data['resource'] = Config::get('url') . '/api/' . $page_variables['relative_url'] . '.json';
             }
 
             $parent_url = implode('/', $path);
