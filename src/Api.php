@@ -39,6 +39,7 @@ class Api
                 $item_data[$property] = $page_variables[$property];
             }
 
+            $api_endpoints[$url]['variables'] = $page_variables;
 
             $api_endpoints[$url]['url'] = $page_variables['url'];
             $item_data['url'] = $page_variables['url'];
@@ -86,10 +87,35 @@ class Api
             }
 
             if (isset($data['items'])) {
+
+                // Move items to bottom of the object
                 $items = $data['items'];
                 unset($data['items']);
+
+                $sort_type = false;
+                $sort_asc = false;
+
+                if(
+                    isset($data['variables']['paginate']) &&
+                    isset($data['variables']['paginate']['sort']) &&
+                    isset($data['variables']['paginate']['sort']['type'])
+                ) {
+                    $sort_asc = isset($data['variables']['paginate']['sort']['asc']) ? $data['variables']['paginate']['sort']['asc'] : false;
+                    $sort_type = $data['variables']['paginate']['sort']['type'];
+                }
+
+                if($sort_type) {
+                    array_multisort(array_column($items, $sort_type), SORT_DESC, SORT_REGULAR, $items);
+    
+                    if($sort_asc) {
+                        $items = array_reverse($items);
+                    }
+                }
+
                 $data['items'] = $items;
             }
+
+            unset($data['variables']);
 
             if (empty($url)) {
                 file_put_contents($build_path . '/../api.json', json_encode($data));
